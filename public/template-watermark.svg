@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">Marca ganadera</title>
+  <circle cx="100" cy="100" r="92" fill="none" stroke="currentColor" stroke-width="4"/>
+  <path d="M55 125V70h35c28 0 48 18 48 55M150 70v55" fill="none" stroke="currentColor" stroke-width="6"/>
+</svg>

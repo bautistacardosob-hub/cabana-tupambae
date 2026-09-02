@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 96" role="img" aria-labelledby="title">
+  <title id="title">Identidad de la cabaña</title>
+  <g fill="none" stroke="currentColor" stroke-width="2">
+    <rect x="2" y="2" width="92" height="92" rx="46"/>
+    <path d="M27 58V35h14c12 0 20 8 20 23M69 35v23"/>
+  </g>
+  <text x="116" y="58" fill="currentColor" font-family="Georgia,serif" font-size="30">Nombre de la cabaña</text>
+</svg>
