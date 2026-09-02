@@ -178,3 +178,16 @@ test("uses a text-safe compact genetics call to action on mobile", async () => {
   assert.match(styles, /avoids emoji rendering on iOS/);
   assert.match(styles, /\.roundLink span br\{display:none\}/);
 });
+
+test("supports whole-page and section-by-section visibility", async () => {
+  const [page, content] = await Promise.all([
+    read("app/page.tsx"),
+    read("lib/template-content.ts"),
+  ]);
+  assert.match(content, /show_cabana:"true"/);
+  assert.match(content, /show_genetics:"true"/);
+  assert.match(page, /pageVisibilityKeys/);
+  assert.match(page, /key:"show_genetics_results",label:"Resultados productivos"/);
+  assert.match(page, /isVisible\(content,"show_genetics_results"\)/);
+  assert.match(page, /window\.location\.replace\("\/"\)/);
+});
