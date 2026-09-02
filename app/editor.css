@@ -633,6 +633,11 @@
   background: #dfd7c9;
 }
 
+.contactBody.noImage {
+  grid-template-columns: minmax(0, 900px);
+  justify-content: center;
+}
+
 .contactPhoto {
   background: url('/cattle-field.jpg') center / cover;
   filter: saturate(.72);

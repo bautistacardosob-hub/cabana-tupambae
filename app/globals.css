@@ -310,3 +310,9 @@ footer>.brandMark img{width:auto;height:clamp(108px,8vw,136px);max-width:min(100
 .siteHeader .brandMark img{height:78px;max-width:290px}
 @media(max-width:900px){.siteHeader .brandMark{min-width:0}.siteHeader .brandMark img{height:66px;max-width:220px}}
 @media(max-width:700px){footer>.brandMark img{height:96px;max-width:260px}}
+
+/* Granular section visibility keeps layouts balanced when individual content is hidden. */
+.storyValues1>div{grid-template-columns:1fr}.storyValues2>div{grid-template-columns:repeat(2,1fr)}
+.geneticsStats1{grid-template-columns:1fr}.geneticsStats2{grid-template-columns:repeat(2,1fr)}
+.geneticsCycle.noImage{grid-template-columns:1fr}.geneticsCycle.noImage>article{min-height:480px;padding:8vw 12vw}
+@media(max-width:900px){.storyValues1>div,.storyValues2>div{grid-template-columns:1fr}.geneticsStats1,.geneticsStats2{grid-template-columns:1fr}.geneticsCycle.noImage>article{min-height:0;padding:70px 24px}}
