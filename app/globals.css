@@ -305,5 +305,8 @@ footer{background:#211710}footer a{color:#d9ae80}footer>small{color:#96877b}
 
 /* Keep detailed ranch marks legible in the public footer. */
 footer>.brandMark{width:100%;min-width:0;align-items:flex-start}
-footer>.brandMark img{width:auto;height:clamp(92px,7vw,118px);max-width:min(100%,320px);object-fit:contain;object-position:left center}
-@media(max-width:700px){footer>.brandMark img{height:86px;max-width:240px}}
+footer>.brandMark img{width:auto;height:clamp(108px,8vw,136px);max-width:min(100%,350px);object-fit:contain;object-position:left center}
+.siteHeader .brandMark{min-width:220px}
+.siteHeader .brandMark img{height:78px;max-width:290px}
+@media(max-width:900px){.siteHeader .brandMark{min-width:0}.siteHeader .brandMark img{height:66px;max-width:220px}}
+@media(max-width:700px){footer>.brandMark img{height:96px;max-width:260px}}
