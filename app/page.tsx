@@ -1403,6 +1403,15 @@ export function SiteApplication({initialScreen="home",initialNewsSlug,initialAni
   const draftMode=initialScreen==="admin"||initialPreview;
   useEffect(()=>{
     let active=true;
+    const backendConfigured=Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL&&process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
+    if(!backendConfigured&&initialScreen!=="admin"){
+      setAnimalsLoaded(true);
+      setAuctionsLoaded(true);
+      setNewsLoaded(true);
+      setInitialDataLoaded(true);
+      setCriticalDataFailed(false);
+      return()=>{active=false};
+    }
     if(initialScreen==="admin")setInitialDataLoaded(false);
     setCriticalDataFailed(false);
     const animalsUrl=initialScreen==="admin"?"/api/animals?all=1":"/api/animals";

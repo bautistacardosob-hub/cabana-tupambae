@@ -97,6 +97,13 @@ test("ships as an isolated neutral client template", async () => {
   assert.match(generator, /Sitio independiente: repositorio, Supabase, Netlify, dominio y \/admin propios/);
 });
 
+test("renders the neutral public preview before Supabase is configured", async () => {
+  const page = await read("app/page.tsx");
+  assert.match(page, /const backendConfigured=Boolean\(process\.env\.NEXT_PUBLIC_SUPABASE_URL&&process\.env\.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY\)/);
+  assert.match(page, /if\(!backendConfigured&&initialScreen!=="admin"\)/);
+  assert.match(page, /setInitialDataLoaded\(true\)/);
+});
+
 test("does not show an empty auction before auction data loads", async () => {
   const [page, styles] = await Promise.all([
     read("app/page.tsx"),
