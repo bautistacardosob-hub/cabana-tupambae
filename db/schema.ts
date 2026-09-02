@@ -146,22 +146,6 @@ export const sitePublications = pgTable("site_publications", {
   publishedAt: timestamp("published_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
 }, (table) => [index("idx_site_publications_cabin_date").on(table.cabinId, table.publishedAt)]);
 
-export const clientSites = pgTable("client_sites", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  slug: text("slug").notNull(),
-  ownerName: text("owner_name"),
-  ownerEmail: text("owner_email"),
-  domain: text("domain"),
-  siteUrl: text("site_url"),
-  adminUrl: text("admin_url"),
-  status: text("status", { enum: ["setup", "active", "paused"] }).notNull().default("setup"),
-  modules: text("modules").notNull().default("[]"),
-  primaryColor: text("primary_color").notNull().default("#6c422b"),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
-}, (table) => [uniqueIndex("idx_client_sites_slug").on(table.slug), index("idx_client_sites_status").on(table.status)]);
-
 export const animalCategories = pgTable("animal_categories", {
   id: serial("id").primaryKey(),
   cabinId: integer("cabin_id").notNull().references(() => cabins.id, { onDelete: "cascade" }),

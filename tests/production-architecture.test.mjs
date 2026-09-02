@@ -104,6 +104,15 @@ test("renders the neutral public preview before Supabase is configured", async (
   assert.match(page, /setInitialDataLoaded\(true\)/);
 });
 
+test("keeps master-panel data outside individual cabin databases", async () => {
+  const [schema, migration] = await Promise.all([
+    read("db/schema.ts"),
+    read("drizzle-postgres/0008_remove_master_panel_table.sql"),
+  ]);
+  assert.doesNotMatch(schema, /clientSites|client_sites/);
+  assert.match(migration, /drop table if exists public\.client_sites/);
+});
+
 test("does not show an empty auction before auction data loads", async () => {
   const [page, styles] = await Promise.all([
     read("app/page.tsx"),
