@@ -1,6 +1,7 @@
 import { and, asc, desc, eq } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { animalMedia, animals, geneticData, pedigreeMembers } from "../../../db/schema";
+import { mediaBucket } from "../../../lib/storage";
 import { requireApiUser } from "../../api-auth";
 
 const cabinId = 1;
@@ -153,8 +154,13 @@ export async function DELETE(request: Request) {
   try {
     const id = Number(new URL(request.url).searchParams.get("id"));
     if (!id) return Response.json({ error: "ID inválido." }, { status: 400 });
-    const [animal] = await getDb().delete(animals).where(eq(animals.id, id)).returning();
+    const db = getDb();
+    const [animal] = await db.select().from(animals).where(and(eq(animals.id, id), eq(animals.cabinId, cabinId))).limit(1);
     if (!animal) return Response.json({ error: "Animal no encontrado." }, { status: 404 });
+    const media = await db.select({ storageKey: animalMedia.storageKey }).from(animalMedia).where(eq(animalMedia.animalId, id));
+    const storageKeys = [...new Set(media.flatMap((item) => item.storageKey ? [item.storageKey] : []))];
+    for (const storageKey of storageKeys) await mediaBucket().delete(storageKey);
+    await db.delete(animals).where(and(eq(animals.id, id), eq(animals.cabinId, cabinId)));
     return Response.json({ deleted: id });
   } catch (error) {
     return Response.json({ error: message(error) }, { status: 500 });

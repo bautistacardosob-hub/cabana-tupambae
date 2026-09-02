@@ -51,6 +51,13 @@ test("supports curated home animals and uploaded PDF documents", async () => {
   assert.match(storageMigration, /25165824/);
 });
 
+test("removes animal media from storage when deleting an animal", async () => {
+  const animalsApi = await read("app/api/animals/route.ts");
+  assert.match(animalsApi, /mediaBucket\(\)\.delete\(storageKey\)/);
+  assert.match(animalsApi, /animalMedia\.animalId/);
+  assert.match(animalsApi, /eq\(animals\.cabinId, cabinId\)/);
+});
+
 test("supports manual ordering of news articles", async () => {
   const [page, newsApi, schema, migration] = await Promise.all([
     read("app/page.tsx"),
