@@ -987,6 +987,8 @@
   resize: vertical;
 }
 
+.contentGroup label:has(select option[value="tierra"]){grid-column:1/-1}.contentGroup label:has(select option[value="tierra"]):after{content:"Vista previa de la paleta";min-height:112px;display:flex;align-items:flex-end;padding:16px;border:1px solid rgba(53,39,31,.14);border-radius:8px;color:#fff;font:700 10px Arial,sans-serif;letter-spacing:.13em;text-transform:uppercase;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);transition:background .2s ease}.contentGroup label:has(select option[value="tierra"]:checked):after{background:linear-gradient(90deg,#35271f 0 25%,#2b1d16 25% 50%,#f3eee4 50% 75%,#ae6d43 75%)}.contentGroup label:has(select option[value="monte"]:checked):after{background:linear-gradient(90deg,#203128 0 25%,#10241a 25% 50%,#f0f2e9 50% 75%,#8d7148 75%)}.contentGroup label:has(select option[value="pampa"]:checked):after{background:linear-gradient(90deg,#30332f 0 25%,#202520 25% 50%,#efebe2 50% 75%,#8c7456 75%)}.contentGroup label:has(select option[value="vino"]:checked):after{background:linear-gradient(90deg,#40292b 0 25%,#2b181b 25% 50%,#f4ebe5 50% 75%,#9d5d50 75%)}
+
 .contentGroup input:focus,
 .contentGroup select:focus,
 .contentGroup textarea:focus {

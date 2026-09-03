@@ -204,10 +204,11 @@ test("links the compact home genetics preview directly to the catalog", async ()
 });
 
 test("offers persistent public color palette presets", async () => {
-  const [page, content, styles] = await Promise.all([
+  const [page, content, styles, editor] = await Promise.all([
     read("app/page.tsx"),
     read("lib/template-content.ts"),
     read("app/globals.css"),
+    read("app/editor.css"),
   ]);
   assert.match(content, /color_palette:"tierra"/);
   assert.match(page, /title:"Paleta de colores"/);
@@ -215,4 +216,5 @@ test("offers persistent public color palette presets", async () => {
   assert.match(styles, /body\[data-palette="monte"\]/);
   assert.match(styles, /body\[data-palette="pampa"\]/);
   assert.match(styles, /body\[data-palette="vino"\]/);
+  assert.match(editor, /Vista previa de la paleta/);
 });
