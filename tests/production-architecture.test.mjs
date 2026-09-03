@@ -218,3 +218,11 @@ test("offers persistent public color palette presets", async () => {
   assert.match(styles, /body\[data-palette="vino"\]/);
   assert.match(editor, /Vista previa de la paleta/);
 });
+
+test("keeps the real cabin identity while the admin reloads", async () => {
+  const page = await read("app/page.tsx");
+  assert.match(page, /cabana-site-identity-v1/);
+  assert.match(page, /content\.brand_name!=="Nombre de la cabaña"/);
+  assert.match(page, /cacheSiteIdentity\(\{brandName:data\.content\.brand_name\}\)/);
+  assert.match(page, /cacheSiteIdentity\(\{logo:logo\.url\}\)/);
+});
