@@ -176,9 +176,18 @@ footer{background:#211710}footer a{color:#d9ae80}footer>small{color:#96877b}
 .availableAnimalsBanner button{flex:0 0 148px;width:148px;height:148px;border:1px solid rgba(255,255,255,.5);border-radius:50%;background:transparent;color:#fff;font:10px/1.45 var(--sans);letter-spacing:.12em;text-transform:uppercase}.availableAnimalsBanner button span{display:block;margin-top:9px;font-size:19px}
 .listingHead{scroll-margin-top:92px}.animalGrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:64px 24px}.animalCard:nth-child(2n) .cardImage,.cardImage{aspect-ratio:4/3}.cardMeta h2{font-size:30px}
 .featuredBox{margin-top:14px}
+.soldBox{margin-top:14px;border-color:#ddcdbd;background:#fffaf5}
+.statusPill.sold{background:#efe2d7;color:#7a4125}.statusPill.sold i{background:#a9623e}
+.animalImage,.cardImage{position:relative}
+.soldBadge{position:absolute;z-index:3;left:18px;bottom:18px;padding:9px 12px;background:#2b1d16;color:#fff;font:700 9px var(--sans);letter-spacing:.16em;text-transform:uppercase}
+.cardImage .soldBadge{left:auto;right:18px;bottom:18px}.cardImage:has(.soldBadge) .openCard{display:none}
+.soldBadgeDetail{position:static;display:inline-flex;margin-bottom:16px;padding:10px 14px;background:#fff;color:#2b1d16}
+.soldText{color:#9a5735;text-transform:uppercase;letter-spacing:.12em;font-size:10px}
+.animalInquiry{display:inline-flex;align-items:center;justify-content:space-between;gap:22px;margin-top:28px;padding:16px 18px;border:1px solid var(--ink);background:var(--ink);color:#fff;text-decoration:none;font:700 10px var(--sans);letter-spacing:.11em;text-transform:uppercase}
+.animalInquiry:hover{background:transparent;color:var(--ink)}
 .newsDocumentLink{display:inline-flex!important;align-items:center;gap:12px;margin:24px 0 8px;padding:15px 18px!important;border:1px solid var(--ink)!important;background:transparent!important;color:var(--ink)!important;text-decoration:none;font:700 11px var(--sans)!important;letter-spacing:.1em;text-transform:uppercase}
 @media(max-width:1100px) and (min-width:701px){.animalGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.availableAnimalsBanner{min-height:460px}.availableAnimalsBanner button{width:132px;height:132px;flex-basis:132px}}
-@media(max-width:700px){.availableAnimalsBanner{min-height:440px;padding:82px 24px 48px;align-items:flex-start;justify-content:flex-end;flex-direction:column;gap:26px}.availableAnimalsBanner h1{font-size:48px}.availableAnimalsBanner p:not(.eyebrow){font-size:16px}.availableAnimalsBanner button{width:auto;height:auto;flex:0;padding:14px 17px;border-radius:0}.availableAnimalsBanner button span{display:inline;margin:0 0 0 9px}.animalGrid{grid-template-columns:1fr;gap:48px}.cardMeta h2{font-size:28px}}
+@media(max-width:700px){.availableAnimalsBanner{min-height:440px;padding:82px 24px 48px;align-items:flex-start;justify-content:flex-end;flex-direction:column;gap:26px}.availableAnimalsBanner h1{font-size:48px}.availableAnimalsBanner p:not(.eyebrow){font-size:16px}.availableAnimalsBanner button{width:auto;height:auto;flex:0;padding:14px 17px;border-radius:0}.availableAnimalsBanner button span{display:inline;margin:0 0 0 9px}.animalGrid{grid-template-columns:1fr;gap:48px}.cardMeta h2{font-size:28px}.soldBadge{left:14px;bottom:14px}.cardImage .soldBadge{right:14px;bottom:14px}.animalInquiry{width:100%}}
 
 /* Final responsive pass: preserve the editorial character without sacrificing usability. */
 @media(max-width:700px){

@@ -249,3 +249,20 @@ test("publishes all drafts atomically without per-row database updates", async (
   assert.match(route, /isNotNull\(siteImages\.draftStorageKey\)/);
   assert.doesNotMatch(route, /for\(const row of contentRows\)/);
 });
+
+test("keeps sold animals visible and gives each one a personalized inquiry link", async () => {
+  const [page, schema, route, migration] = await Promise.all([
+    read("app/page.tsx"),
+    read("db/schema.ts"),
+    read("app/api/animals/route.ts"),
+    read("drizzle-postgres/0009_animal_sale_status.sql"),
+  ]);
+  assert.match(schema, /sold: boolean\("sold"\).*default\(false\)/);
+  assert.match(route, /sold: Boolean\(payload\.sold\)/);
+  assert.match(migration, /add column if not exists sold boolean not null default false/);
+  assert.match(page, /Animal vendido/);
+  assert.match(page, /La ficha seguirá publicada en el catálogo con la etiqueta “Vendido”/);
+  assert.match(page, /Hola, quisiera consultar por \$\{reference\}/);
+  assert.match(page, /Consultar por este animal/);
+  assert.match(page, /a\.sold&&<span className="soldBadge">Vendido<\/span>/);
+});

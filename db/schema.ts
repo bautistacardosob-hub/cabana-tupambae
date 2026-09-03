@@ -37,6 +37,7 @@ export const animals = pgTable("animals", {
   pedigreeDescription: text("pedigree_description").notNull().default("Una genealogía sólida, construida sobre padres y madres que marcaron nuestro rodeo."),
   status: text("status", { enum: ["published", "draft"] }).notNull().default("draft"),
   featured: boolean("featured").notNull().default(false),
+  sold: boolean("sold").notNull().default(false),
   image: text("image").notNull().default("/animal-black.jpg"),
   birthWeight: text("birth_weight"),
   weaningWeight: text("weaning_weight"),

@@ -40,6 +40,7 @@ function clean(payload: Record<string, unknown>) {
     pedigreeDescription: editorial("pedigreeDescription", "Una genealogía sólida, construida sobre padres y madres que marcaron nuestro rodeo."),
     status: payload.status === "published" ? "published" as const : "draft" as const,
     featured: Boolean(payload.featured),
+    sold: Boolean(payload.sold),
     image: value("image") || "/animal-black.jpg",
     birthWeight: value("birthWeight") || null,
     weaningWeight: value("weaningWeight") || null,
