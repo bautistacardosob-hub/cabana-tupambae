@@ -1,4 +1,4 @@
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, isNotNull, sql } from "drizzle-orm";
 import { getDb } from "../../../db";
 import { siteContent, siteImages, sitePublications } from "../../../db/schema";
 import { requireApiUser } from "../../api-auth";
@@ -23,11 +23,16 @@ export async function POST(){
   const unauthorized=await requireApiUser();if(unauthorized)return unauthorized;
   try{
     const db=getDb();
-    const [contentRows,imageRows]=await Promise.all([db.select().from(siteContent).where(eq(siteContent.cabinId,cabinId)),db.select().from(siteImages).where(eq(siteImages.cabinId,cabinId))]);
-    for(const row of contentRows)if(row.draftValue!==null)await db.update(siteContent).set({value:row.draftValue,draftValue:null,updatedAt:new Date().toISOString()}).where(eq(siteContent.id,row.id));
-    for(const row of imageRows)if(row.draftStorageKey)await db.update(siteImages).set({storageKey:row.draftStorageKey,contentType:row.draftContentType,draftStorageKey:null,draftContentType:null,updatedAt:new Date().toISOString()}).where(eq(siteImages.id,row.id));
-    const snapshot=await currentSnapshot();
-    const [publication]=await db.insert(sitePublications).values({cabinId,snapshot:JSON.stringify(snapshot),publishedAt:new Date().toISOString()}).returning();
+    const {publication,snapshot}=await db.transaction(async tx=>{
+      const updatedAt=new Date().toISOString();
+      await tx.update(siteContent).set({value:sql`${siteContent.draftValue}`,draftValue:null,updatedAt}).where(and(eq(siteContent.cabinId,cabinId),isNotNull(siteContent.draftValue)));
+      await tx.update(siteImages).set({storageKey:sql`${siteImages.draftStorageKey}`,contentType:sql`${siteImages.draftContentType}`,draftStorageKey:null,draftContentType:null,updatedAt}).where(and(eq(siteImages.cabinId,cabinId),isNotNull(siteImages.draftStorageKey)));
+      const contentRows=await tx.select().from(siteContent).where(eq(siteContent.cabinId,cabinId));
+      const imageRows=await tx.select().from(siteImages).where(eq(siteImages.cabinId,cabinId));
+      const snapshot:Snapshot={content:Object.fromEntries(contentRows.map(row=>[row.contentKey,row.value])),images:Object.fromEntries(imageRows.map(row=>[row.imageKey,{storageKey:row.storageKey,fallbackUrl:row.fallbackUrl,contentType:row.contentType}]))};
+      const [publication]=await tx.insert(sitePublications).values({cabinId,snapshot:JSON.stringify(snapshot),publishedAt:updatedAt}).returning();
+      return {publication,snapshot};
+    });
     return Response.json({publication:{id:publication.id,publishedAt:publication.publishedAt},content:snapshot.content,images:Object.entries(snapshot.images).map(([imageKey,image])=>({imageKey,url:imageUrl(image.storageKey,image.fallbackUrl)}))});
   }catch(error){return Response.json({error:error instanceof Error?error.message:"No se pudieron publicar los cambios."},{status:500})}
 }

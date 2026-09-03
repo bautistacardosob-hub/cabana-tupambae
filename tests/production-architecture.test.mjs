@@ -241,3 +241,11 @@ test("offers editable SEO, social preview and discovery metadata", async () => {
   assert.match(robots, /sitemap\.xml/);
   assert.match(sitemap, /\/genetica/);
 });
+
+test("publishes all drafts atomically without per-row database updates", async () => {
+  const route = await read("app/api/publication/route.ts");
+  assert.match(route, /db\.transaction/);
+  assert.match(route, /isNotNull\(siteContent\.draftValue\)/);
+  assert.match(route, /isNotNull\(siteImages\.draftStorageKey\)/);
+  assert.doesNotMatch(route, /for\(const row of contentRows\)/);
+});
