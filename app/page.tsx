@@ -57,7 +57,7 @@ function findNextAuction(auctions:AuctionRecord[]){
   return auctions.filter(item=>item.published&&item.status==="upcoming"&&Boolean(item.auctionDate)&&new Date(`${item.auctionDate}T12:00:00`)>=today).sort((a,b)=>String(a.auctionDate).localeCompare(String(b.auctionDate)))[0]??null;
 }
 
-function animalInquiryUrl(whatsapp:string,animal:AnimalRecord){
+function animalInquiryUrl(whatsapp:string,phone:string,animal:AnimalRecord){
   const reference=`${animal.name}${animal.rp?` (RP ${animal.rp})`:""}`;
   const message=animal.sold
     ? `Hola, vi que ${reference} figura como vendido. Quisiera consultar por animales similares.`
@@ -71,9 +71,15 @@ function animalInquiryUrl(whatsapp:string,animal:AnimalRecord){
       url.searchParams.set("text",message);
       return url.toString();
     }
+    if(url.hostname.includes("wa.link")){
+      const configuredPhone=phone.replace(/\D/g,"");
+      if(configuredPhone)return `https://wa.me/${configuredPhone}?text=${encodeURIComponent(message)}`;
+      url.searchParams.set("text",message);
+      return url.toString();
+    }
   }catch{}
-  const phone=raw.replace(/\D/g,"");
-  return phone?`https://wa.me/${phone}?text=${encodeURIComponent(message)}`:"";
+  const rawPhone=raw.replace(/\D/g,"");
+  return rawPhone?`https://wa.me/${rawPhone}?text=${encodeURIComponent(message)}`:"";
 }
 
 function Brand({ dark = false }: { dark?: boolean }) {
@@ -270,7 +276,7 @@ function AnimalDetail({ go, animal, siteImages, loaded=true }: { go: (s: Screen)
   const visibleGallery=uploadedImages.slice(0,3);
   const imageClasses=["galleryMain","galleryTop","galleryBottom"];
   const showBrand=isVisible(content,"show_animal_watermark");
-  const inquiryUrl=animalInquiryUrl(content.contact_whatsapp||"",animal);
+  const inquiryUrl=animalInquiryUrl(content.contact_whatsapp||"",content.contact_phone||"",animal);
 
   return <div className="detailPage"><section className="detailHero" style={{backgroundImage:`url(${animal.image})`}}><Header screen="animal" go={go}/><div className="detailOverlay"/><button className="backButton" onClick={()=>go("genetica")}>← Volver a genética</button><div className="detailTitle">{animal.sold&&<span className="soldBadge soldBadgeDetail">Vendido</span>}<p className="eyebrow">{animal.type} · {animal.breed}</p><h1>{first}<br/><em>{rest}</em></h1><div className="heroFacts"><span><small>RP</small>{animal.rp}</span><span><small>Nacimiento</small>{animal.birthDate||"Sin dato"}</span><span><small>Pelaje</small>{animal.coat||"Sin dato"}</span></div></div><div className="imageCounter">01 <i/> 04</div></section><section className="detailIntro"><div><p className="sectionNumber">01 — El ejemplar</p>{(animal.introTitle||animal.introEmphasis)&&<h2>{animal.introTitle}{animal.introTitle&&animal.introEmphasis&&<br/>}{animal.introEmphasis&&<em>{animal.introEmphasis}</em>}</h2>}</div><div className="description">{animal.description&&<p>{animal.description}</p>}{animal.introSecondary&&<p>{animal.introSecondary}</p>}{inquiryUrl&&<a className="animalInquiry" href={inquiryUrl} target="_blank" rel="noreferrer">{animal.sold?"Consultar por animales similares":"Consultar por este animal"} <span>↗</span></a>}</div>
 {showBrand&&<div className="animalBrandWatermark" aria-hidden="true"><img src={siteImages["brand-watermark"]||defaultSiteImages["brand-watermark"]} alt=""/></div>}

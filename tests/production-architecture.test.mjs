@@ -263,6 +263,8 @@ test("keeps sold animals visible and gives each one a personalized inquiry link"
   assert.match(page, /Animal vendido/);
   assert.match(page, /La ficha seguirá publicada en el catálogo con la etiqueta “Vendido”/);
   assert.match(page, /Hola, quisiera consultar por \$\{reference\}/);
+  assert.match(page, /url\.hostname\.includes\("wa\.link"\)/);
+  assert.match(page, /content\.contact_phone\|\|""/);
   assert.match(page, /Consultar por este animal/);
   assert.match(page, /a\.sold&&<span className="soldBadge">Vendido<\/span>/);
 });
