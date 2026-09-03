@@ -266,5 +266,7 @@ test("keeps sold animals visible and gives each one a personalized inquiry link"
   assert.match(page, /url\.hostname\.includes\("wa\.link"\)/);
   assert.match(page, /content\.contact_phone\|\|""/);
   assert.match(page, /Consultar por este animal/);
+  assert.match(page, /← Volver al catálogo/);
+  assert.match(page, /\/genetica#catalogo-animales/);
   assert.match(page, /a\.sold&&<span className="soldBadge">Vendido<\/span>/);
 });
