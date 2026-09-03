@@ -1,6 +1,9 @@
 export const templateContent: Record<string,string> = {
   brand_name:"Nombre de la cabaña",
   brand_tagline:"Genética, trabajo y tradición",
+  seo_title:"",
+  seo_description:"",
+  seo_keywords:"genética bovina, cabaña ganadera, reproductores",
   home_hero_line_1:"Una historia de campo",
   home_hero_line_2:"con identidad propia.",
   home_hero_copy:"Completá la identidad, la historia y la propuesta genética desde el administrador de esta web.",
@@ -112,6 +115,8 @@ export const templateContent: Record<string,string> = {
 };
 
 export const templateSiteImages = [
+  ["seo-share","Vista previa al compartir","/hero-cattle.jpg"],
+  ["site-icon","Ícono del sitio","/favicon.svg"],
   ["home-hero","Portada principal","/hero-cattle.jpg"],
   ["establishment","El establecimiento","/ranch.jpg"],
   ["genetics-hero","Programa genético","/cattle-field.jpg"],

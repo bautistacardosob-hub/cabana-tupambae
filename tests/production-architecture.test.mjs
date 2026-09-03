@@ -226,3 +226,18 @@ test("keeps the real cabin identity while the admin reloads", async () => {
   assert.match(page, /cacheSiteIdentity\(\{brandName:data\.content\.brand_name\}\)/);
   assert.match(page, /cacheSiteIdentity\(\{logo:logo\.url\}\)/);
 });
+
+test("offers editable SEO, social preview and discovery metadata", async () => {
+  const [page, layout, identity, images, robots, sitemap] = await Promise.all([
+    read("app/page.tsx"), read("app/layout.tsx"), read("lib/site-identity.ts"),
+    read("app/api/site-images/route.ts"), read("app/robots.ts"), read("app/sitemap.ts"),
+  ]);
+  assert.match(page, /title:"SEO y vista previa"/);
+  assert.match(page, /key:"seo-share"/);
+  assert.match(page, /key:"site-icon"/);
+  assert.match(layout, /summary_large_image/);
+  assert.match(identity, /seo_description/);
+  assert.match(images, /\["brand-watermark","site-icon"\]/);
+  assert.match(robots, /sitemap\.xml/);
+  assert.match(sitemap, /\/genetica/);
+});

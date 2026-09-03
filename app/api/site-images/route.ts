@@ -9,7 +9,7 @@ const allowedImages = new Set(["image/jpeg", "image/png", "image/webp", "image/g
 const maxImageBytes = 12 * 1024 * 1024;
 
 const isAllowedImage = (imageKey:string, contentType:string) =>
-  allowedImages.has(contentType) || (imageKey === "brand-watermark" && contentType === "image/svg+xml");
+  allowedImages.has(contentType) || (["brand-watermark","site-icon"].includes(imageKey) && contentType === "image/svg+xml");
 
 const bucket = mediaBucket;
 
