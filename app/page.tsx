@@ -41,6 +41,12 @@ const useSiteContent=()=>useContext(ContentContext);
 const isVisible=(content:SiteContentMap,key:string)=>content[key]!=="false";
 const pageVisibilityKeys:Partial<Record<Screen,string>>={cabana:"show_cabana",genetica:"show_genetics",criollos:"show_criollos",actualidad:"show_news",galeria:"show_gallery",contacto:"show_contact"};
 const customPagesFromContent=(content:SiteContentMap):CustomPage[]=>{try{const value=JSON.parse(content.custom_pages_json||"[]");return Array.isArray(value)?value.filter(item=>item&&typeof item.slug==="string"):[]}catch{return []}};
+const colorPalettes=[
+  {id:"tierra",name:"Tierra",copy:"Cálida, editorial y natural.",colors:["#35271f","#2b1d16","#f3eee4","#ae6d43"]},
+  {id:"monte",name:"Monte",copy:"Verdes profundos y tonos orgánicos.",colors:["#203128","#10241a","#f0f2e9","#8d7148"]},
+  {id:"pampa",name:"Pampa",copy:"Neutra, sobria y contemporánea.",colors:["#30332f","#202520","#efebe2","#8c7456"]},
+  {id:"vino",name:"Vino",copy:"Borgoña elegante con acentos suaves.",colors:["#40292b","#2b181b","#f4ebe5","#9d5d50"]}
+] as const;
 
 function findNextAuction(auctions:AuctionRecord[]){
   const today=new Date();today.setHours(0,0,0,0);
@@ -1329,6 +1335,7 @@ function PageContent({siteImages,content,updateSiteImage,updateContent}:{siteIma
     {page:"general",title:"Identidad",copy:"Información compartida por todo el sitio.",fields:[{key:"brand_name",label:"Nombre de la cabaña"},{key:"brand_tagline",label:"Lema o especialidad"},{key:"establishment_name",label:"Nombre del establecimiento"},{key:"establishment_location",label:"Ubicación"}]},
     {page:"general",title:"Redes y video",copy:"Solo aparecen los enlaces que tengan contenido.",fields:[{key:"social_instagram",label:"Instagram · enlace completo"},{key:"social_facebook",label:"Facebook · enlace completo"},{key:"social_youtube",label:"YouTube · enlace del canal"},{key:"institutional_video",label:"Video institucional"}]},
     {page:"general",title:"Tipografía",copy:"Elegí la escala general. El diseño y las proporciones de la plantilla se mantienen protegidos.",fields:[{key:"font_size_titles",label:"Tamaño de títulos",options:[{value:"small",label:"Compacto"},{value:"normal",label:"Normal"},{value:"large",label:"Grande"}]},{key:"font_size_body",label:"Tamaño de textos",options:[{value:"small",label:"Compacto"},{value:"normal",label:"Normal"},{value:"large",label:"Grande"}]}]},
+    {page:"general",title:"Paleta de colores",copy:"Elegí una identidad cromática preestablecida. La opción se aplica en toda la web al publicar los cambios.",fields:[{key:"color_palette",label:"Estilo de color",options:colorPalettes.map(palette=>({value:palette.id,label:`${palette.name} · ${palette.copy}`}))}]},
     {page:"home",title:"Portada",copy:"El primer mensaje que recibe quien visita el sitio.",fields:[{key:"home_hero_line_1",label:"Título · primera línea"},{key:"home_hero_line_2",label:"Título · segunda línea"},{key:"home_hero_copy",label:"Texto de apertura",long:true}]},
     {page:"home",title:"Presentación",copy:"La introducción institucional de la Home.",fields:[{key:"home_intro_eyebrow",label:"Antetítulo"},{key:"home_intro_line_1",label:"Título · primera línea"},{key:"home_intro_line_2",label:"Título · segunda línea"},{key:"home_intro_copy",label:"Descripción",long:true},{key:"genetics_line_1",label:"Genética · primera línea"},{key:"genetics_line_2",label:"Genética · segunda línea"}]},
     {page:"cabana",title:"Historia de la cabaña",copy:"Presentación principal de la página.",fields:[{key:"cabana_eyebrow",label:"Antetítulo"},{key:"cabana_title_line_1",label:"Título · primera línea"},{key:"cabana_title_line_2",label:"Título · segunda línea"},{key:"cabana_lead",label:"Introducción",long:true},{key:"cabana_story_1",label:"Historia · primer bloque",long:true},{key:"cabana_story_2",label:"Historia · segundo bloque",long:true},{key:"cabana_year",label:"Año de origen"}]},
@@ -1418,6 +1425,11 @@ export function SiteApplication({initialScreen="home",initialNewsSlug,initialAni
   const [initialDataLoaded,setInitialDataLoaded]=useState(false);
   const nextAuction=findNextAuction(auctions);
   const draftMode=initialScreen==="admin"||initialPreview;
+  useEffect(()=>{
+    if(initialScreen==="admin")delete document.body.dataset.palette;
+    else document.body.dataset.palette=content.color_palette||"tierra";
+    return()=>{delete document.body.dataset.palette};
+  },[content.color_palette,initialScreen]);
   useEffect(()=>{
     let active=true;
     const backendConfigured=Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL&&process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);

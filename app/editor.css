@@ -970,6 +970,7 @@
 }
 
 .contentGroup input,
+.contentGroup select,
 .contentGroup textarea {
   width: 100%;
   padding: 11px 12px;
@@ -987,6 +988,7 @@
 }
 
 .contentGroup input:focus,
+.contentGroup select:focus,
 .contentGroup textarea:focus {
   border-color: #819b8d;
   box-shadow: 0 0 0 3px rgba(49, 84, 67, .08);

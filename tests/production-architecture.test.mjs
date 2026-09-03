@@ -202,3 +202,17 @@ test("links the compact home genetics preview directly to the catalog", async ()
   assert.match(styles, /\.intro \+ \.geneticsPreview\{padding-top:55px\}/);
   assert.match(styles, /#catalogo-animales\{scroll-margin-top:90px\}/);
 });
+
+test("offers persistent public color palette presets", async () => {
+  const [page, content, styles] = await Promise.all([
+    read("app/page.tsx"),
+    read("lib/template-content.ts"),
+    read("app/globals.css"),
+  ]);
+  assert.match(content, /color_palette:"tierra"/);
+  assert.match(page, /title:"Paleta de colores"/);
+  assert.match(page, /document\.body\.dataset\.palette=content\.color_palette/);
+  assert.match(styles, /body\[data-palette="monte"\]/);
+  assert.match(styles, /body\[data-palette="pampa"\]/);
+  assert.match(styles, /body\[data-palette="vino"\]/);
+});

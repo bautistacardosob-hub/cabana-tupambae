@@ -76,6 +76,7 @@ export const templateContent: Record<string,string> = {
   institutional_video:"",
   font_size_titles:"normal",
   font_size_body:"normal",
+  color_palette:"tierra",
   show_cabana:"true",
   show_genetics:"true",
   show_home_intro:"true",
