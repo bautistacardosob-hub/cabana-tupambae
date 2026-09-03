@@ -316,3 +316,9 @@ footer>.brandMark img{width:auto;height:clamp(108px,8vw,136px);max-width:min(100
 .geneticsStats1{grid-template-columns:1fr}.geneticsStats2{grid-template-columns:repeat(2,1fr)}
 .geneticsCycle.noImage{grid-template-columns:1fr}.geneticsCycle.noImage>article{min-height:480px;padding:8vw 12vw}
 @media(max-width:900px){.storyValues1>div,.storyValues2>div{grid-template-columns:1fr}.geneticsStats1,.geneticsStats2{grid-template-columns:1fr}.geneticsCycle.noImage>article{min-height:0;padding:70px 24px}}
+
+/* A tighter handoff keeps the home introduction and genetics preview visually connected. */
+.intro{padding-bottom:80px}
+.intro + .geneticsPreview{padding-top:55px}
+#catalogo-animales{scroll-margin-top:90px}
+@media(max-width:900px){.intro{padding-bottom:56px}.intro + .geneticsPreview{padding-top:40px}#catalogo-animales{scroll-margin-top:70px}}

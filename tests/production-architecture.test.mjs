@@ -191,3 +191,14 @@ test("supports whole-page and section-by-section visibility", async () => {
   assert.match(page, /isVisible\(content,"show_genetics_results"\)/);
   assert.match(page, /window\.location\.replace\("\/"\)/);
 });
+
+test("links the compact home genetics preview directly to the catalog", async () => {
+  const [page, styles] = await Promise.all([
+    read("app/page.tsx"),
+    read("app/globals.css"),
+  ]);
+  assert.match(page, /window\.location\.assign\("\/genetica#catalogo-animales"\)/);
+  assert.match(page, /window\.location\.hash!=="#catalogo-animales"/);
+  assert.match(styles, /\.intro \+ \.geneticsPreview\{padding-top:55px\}/);
+  assert.match(styles, /#catalogo-animales\{scroll-margin-top:90px\}/);
+});

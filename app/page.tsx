@@ -124,7 +124,7 @@ function Home({ go, animals, auctions, siteImages, news, galleryMedia, openAnima
     {isVisible(content,"show_home_establishment")&&<section className="widePhoto" style={{backgroundImage:`url(${siteImages.establishment})`}} aria-label="Ganado Angus en el establecimiento"><div className="photoCaption"><span>{content.establishment_name}</span><span>{content.establishment_location}</span></div></section>}
     {homeCarousels("before_genetics")}
     {auctionPosition==="before_genetics"&&auctionSection}
-    {isVisible(content,"show_genetics")&&isVisible(content,"show_home_genetics")&&<section className={`geneticsPreview animalCount${homeAnimals.length}`} id="genetica"><div className="previewLead"><p className="sectionNumber">02 — Nuestra genética</p><h2>{content.genetics_line_1}{content.genetics_line_2&&<><br/><em>{content.genetics_line_2}</em></>}</h2><button className="textLink" onClick={() => go("genetica")}>{visible.length?"Ver todos los animales":"Conocer el programa"} <span>↗</span></button></div>{homeAnimals.map((a,i)=><article className={`homeAnimal animal${i+1}`} key={a.id??a.name} onClick={() => openAnimal(a)}><div className="animalImage" style={{backgroundImage:`url(${a.image})`}}/><div><span>{a.type}</span><h3>{a.name}</h3><small>RP {a.rp} · {a.breed}</small></div></article>)}</section>}
+    {isVisible(content,"show_genetics")&&isVisible(content,"show_home_genetics")&&<section className={`geneticsPreview animalCount${homeAnimals.length}`} id="genetica"><div className="previewLead"><p className="sectionNumber">02 — Nuestra genética</p><h2>{content.genetics_line_1}{content.genetics_line_2&&<><br/><em>{content.genetics_line_2}</em></>}</h2><button className="textLink" onClick={() => visible.length?window.location.assign("/genetica#catalogo-animales"):go("genetica")}>{visible.length?"Ver todos los animales":"Conocer el programa"} <span>↗</span></button></div>{homeAnimals.map((a,i)=><article className={`homeAnimal animal${i+1}`} key={a.id??a.name} onClick={() => openAnimal(a)}><div className="animalImage" style={{backgroundImage:`url(${a.image})`}}/><div><span>{a.type}</span><h3>{a.name}</h3><small>RP {a.rp} · {a.breed}</small></div></article>)}</section>}
     {homeCarousels("before_auction")}
     {auctionPosition==="after_genetics"&&auctionSection}
     {homeCarousels("after_auction")}
@@ -202,6 +202,11 @@ function AuctionPage({go,loaded}:{go:(screen:Screen)=>void;loaded:boolean}){
 
 function Genetics({ go, animals, categories, siteImages, openAnimal }: { go: (s: Screen) => void; animals: AnimalRecord[]; categories:CategoryRecord[]; siteImages:SiteImageMap; openAnimal: (animal: AnimalRecord) => void }) {
   const content=useSiteContent();
+  useEffect(()=>{
+    if(window.location.hash!=="#catalogo-animales")return;
+    const frame=window.requestAnimationFrame(()=>document.getElementById("catalogo-animales")?.scrollIntoView({block:"start"}));
+    return()=>window.cancelAnimationFrame(frame);
+  },[]);
   const [filter,setFilter]=useState("Todos");
   const [query,setQuery]=useState("");
   const [sort,setSort]=useState<"featured"|"name"|"rp">("featured");
