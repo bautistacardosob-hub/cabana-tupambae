@@ -2,7 +2,22 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const read = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+const readRaw = (path) => readFile(new URL(`../${path}`, import.meta.url), "utf8");
+const read = async (path) => {
+  const source = await readRaw(path);
+  if (path !== "app/page.tsx") return source;
+  return `${source}\n${await readRaw("app/admin-panel.tsx")}`;
+};
+
+test("loads the admin editor outside the public page bundle", async () => {
+  const [page, admin] = await Promise.all([
+    readRaw("app/page.tsx"),
+    readRaw("app/admin-panel.tsx"),
+  ]);
+  assert.match(page, /dynamic\(\(\)=>import\("\.\/admin-panel"\)/);
+  assert.doesNotMatch(page, /function Admin\(/);
+  assert.match(admin, /export default function Admin\(/);
+});
 
 test("uses Next.js, Supabase and Netlify in the commercial edition", async () => {
   const [pkg, config, env] = await Promise.all([
