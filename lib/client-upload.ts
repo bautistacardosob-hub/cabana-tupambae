@@ -10,6 +10,27 @@ const maxDocumentBytes = 24 * 1024 * 1024;
 type ApiError = { error?: string };
 type PreparedUpload = ApiError & { upload?: { path: string; token: string } };
 
+async function optimizedUpload(file: File) {
+  if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || file.size < 500 * 1024) return file;
+  try {
+    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const scale = Math.min(1, 2400 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const context = canvas.getContext("2d");
+    if (!context) return file;
+    context.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.82));
+    if (!blob || blob.size >= file.size) return file;
+    const name = file.name.replace(/\.[^.]+$/, "") || "imagen";
+    return new File([blob], `${name}.webp`, { type: "image/webp", lastModified: file.lastModified });
+  } catch {
+    return file;
+  }
+}
+
 export async function readApiJson<T extends ApiError>(response: Response): Promise<T> {
   const text = await response.text();
   if (!text) {
@@ -26,24 +47,25 @@ export async function readApiJson<T extends ApiError>(response: Response): Promi
 export async function uploadImageDirect<T extends ApiError>(endpoint: string, file: File, metadata: Record<string, unknown>): Promise<T> {
   if (!allowedImages.has(file.type)) throw new Error("Usá una imagen JPG, PNG, WebP, GIF o SVG.");
   if (file.size > maxImageBytes) throw new Error("La imagen no puede superar los 12 MB.");
+  const uploadFile = await optimizedUpload(file);
 
   const prepareResponse = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "prepare-image", ...metadata, filename: file.name, contentType: file.type, size: file.size }),
+    body: JSON.stringify({ action: "prepare-image", ...metadata, filename: uploadFile.name, contentType: uploadFile.type, size: uploadFile.size }),
   });
   const prepared = await readApiJson<PreparedUpload>(prepareResponse);
   if (!prepareResponse.ok || !prepared.upload) throw new Error(prepared.error || "No se pudo preparar la fotografía.");
 
   const { error: uploadError } = await createBrowserSupabaseClient().storage
     .from("media")
-    .uploadToSignedUrl(prepared.upload.path, prepared.upload.token, file, { contentType: file.type });
+    .uploadToSignedUrl(prepared.upload.path, prepared.upload.token, uploadFile, { contentType: uploadFile.type });
   if (uploadError) throw new Error(uploadError.message || "No se pudo subir la fotografía.");
 
   const completeResponse = await fetch(endpoint, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "complete-image", ...metadata, storageKey: prepared.upload.path, filename: file.name, contentType: file.type, size: file.size }),
+    body: JSON.stringify({ action: "complete-image", ...metadata, storageKey: prepared.upload.path, filename: uploadFile.name, contentType: uploadFile.type, size: uploadFile.size }),
   });
   const completed = await readApiJson<T>(completeResponse);
   if (!completeResponse.ok) throw new Error(completed.error || "No se pudo registrar la fotografía.");
