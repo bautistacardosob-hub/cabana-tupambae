@@ -30,6 +30,14 @@ test("uses Next.js, Supabase and Netlify in the commercial edition", async () =>
   assert.doesNotMatch(pkg, /vinext|wrangler|sites-vite-plugin/);
 });
 
+test("allows public content images through Netlify Image CDN", async () => {
+  const config = await read("netlify.toml");
+  assert.match(config, /remote_images/);
+  assert.match(config, /curupy/);
+  assert.match(config, /supabase/);
+  assert.ok(config.includes("storage/v1/object/public"));
+});
+
 test("protects the individual admin with Supabase membership", async () => {
   const [adminPage, auth, apiAuth] = await Promise.all([
     read("app/admin/page.tsx"), read("app/auth.ts"), read("app/api-auth.ts"),
