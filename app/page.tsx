@@ -47,6 +47,10 @@ type CachedSiteIdentity={brandName?:string;logo?:string};
 const siteIdentityCacheKey="cabana-site-identity-v1";
 const readCachedSiteIdentity=():CachedSiteIdentity=>{if(typeof window==="undefined")return {};try{return JSON.parse(localStorage.getItem(siteIdentityCacheKey)||"{}") as CachedSiteIdentity}catch{return {}}};
 const cacheSiteIdentity=(values:CachedSiteIdentity)=>{if(typeof window==="undefined")return;try{const current=readCachedSiteIdentity();localStorage.setItem(siteIdentityCacheKey,JSON.stringify({...current,...values}))}catch{}};
+type CachedPublicSnapshot={content?:SiteContentMap;images?:SiteImageRecord[];savedAt?:number};
+const publicSnapshotCacheKey="cabana-public-snapshot-v1";
+const readCachedPublicSnapshot=():CachedPublicSnapshot=>{if(typeof window==="undefined")return {};try{const value=JSON.parse(localStorage.getItem(publicSnapshotCacheKey)||"{}");return value&&typeof value==="object"?value as CachedPublicSnapshot:{}}catch{return {}}};
+const cachePublicSnapshot=(content?:SiteContentMap,images?:SiteImageRecord[])=>{if(typeof window==="undefined"||!content||!images?.length)return;try{localStorage.setItem(publicSnapshotCacheKey,JSON.stringify({content,images,savedAt:Date.now()}))}catch{}};
 export const colorPalettes=[
   {id:"tierra",name:"Tierra",copy:"Cálida, editorial y natural.",colors:["#35271f","#2b1d16","#f3eee4","#ae6d43"]},
   {id:"monte",name:"Monte",copy:"Verdes profundos y tonos orgánicos.",colors:["#203128","#10241a","#f0f2e9","#8d7148"]},
@@ -339,6 +343,7 @@ export function SiteApplication({initialScreen="home",initialNewsSlug,initialAni
     return()=>{delete document.body.dataset.palette};
   },[content.color_palette,initialScreen]);
   useEffect(()=>{if(initialScreen!=="admin")return;const cached=readCachedSiteIdentity();if(cached.brandName)setContent(current=>({...current,brand_name:cached.brandName!}));if(cached.logo)setSiteImages(current=>({...current,"brand-logo":cached.logo!}))},[initialScreen]);
+  useEffect(()=>{if(initialScreen==="admin"||initialPreview)return;const cached=readCachedPublicSnapshot();const cachedImages=cached.images;if(cached.content)setContent(current=>({...current,...cached.content}));if(cachedImages?.length)setSiteImages(current=>({...current,...Object.fromEntries(cachedImages.map(image=>[image.imageKey,image.url]))}));if(cached.content&&cachedImages?.length)setInitialDataLoaded(true)},[initialScreen,initialPreview]);
   useEffect(()=>{
     let active=true;
     const backendConfigured=Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL&&process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
@@ -354,7 +359,7 @@ export function SiteApplication({initialScreen="home",initialNewsSlug,initialAni
     setCriticalDataFailed(false);
     const animalsUrl=initialScreen==="admin"?"/api/animals?all=1":"/api/animals";
     const adminSuffix=initialScreen==="admin"?"?all=1":"";
-    const bootstrapRequest=initialScreen!=="admin"&&!draftMode?fetch("/api/bootstrap").then(async response=>{if(!response.ok)throw new Error("No se pudo cargar el sitio.");const data=await response.json() as {content?:SiteContentMap;images?:SiteImageRecord[]};if(data.content){setContent(current=>({...current,...data.content}));if(data.content.brand_name)cacheSiteIdentity({brandName:data.content.brand_name})}if(data.images?.length){setSiteImages(current=>({...current,...Object.fromEntries(data.images!.map(image=>[image.imageKey,image.url]))}));const logo=data.images.find(image=>image.imageKey==="brand-logo");if(logo)cacheSiteIdentity({logo:logo.url})}}).catch(()=>setCriticalDataFailed(true)):null;
+    const bootstrapRequest=initialScreen!=="admin"&&!draftMode?fetch("/api/bootstrap").then(async response=>{if(!response.ok)throw new Error("No se pudo cargar el sitio.");const data=await response.json() as {content?:SiteContentMap;images?:SiteImageRecord[]};if(data.content){setContent(current=>({...current,...data.content}));if(data.content.brand_name)cacheSiteIdentity({brandName:data.content.brand_name})}if(data.images?.length){setSiteImages(current=>({...current,...Object.fromEntries(data.images!.map(image=>[image.imageKey,image.url]))}));const logo=data.images.find(image=>image.imageKey==="brand-logo");if(logo)cacheSiteIdentity({logo:logo.url})}cachePublicSnapshot(data.content,data.images)}).catch(()=>setCriticalDataFailed(true)):null;
     const imageRequest=bootstrapRequest??fetch(draftMode?"/api/site-images?draft=1":"/api/site-images").then(async response=>{if(!response.ok)throw new Error("No se pudieron cargar las imágenes del sitio.");const data=await response.json() as {images?:SiteImageRecord[];hasDraft?:boolean};if(data.images?.length){setSiteImages(current=>({...current,...Object.fromEntries(data.images!.map(image=>[image.imageKey,image.url]))}));const logo=data.images.find(image=>image.imageKey==="brand-logo");if(logo)cacheSiteIdentity({logo:logo.url})}if(data.hasDraft)setPublicationPending(true)}).catch(()=>setCriticalDataFailed(true));
     const contentRequest=bootstrapRequest??fetch(draftMode?"/api/site-content?draft=1":"/api/site-content").then(async response=>{if(!response.ok)throw new Error("No se pudo cargar la identidad del sitio.");const data=await response.json() as {content?:SiteContentMap;hasDraft?:boolean};if(data.content){setContent(current=>({...current,...data.content}));if(data.content.brand_name)cacheSiteIdentity({brandName:data.content.brand_name})}if(data.hasDraft)setPublicationPending(true)}).catch(()=>setCriticalDataFailed(true));
     const secondaryRequests=[
