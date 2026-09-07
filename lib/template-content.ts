@@ -79,6 +79,7 @@ export const templateContent: Record<string,string> = {
   institutional_video:"",
   font_size_titles:"normal",
   font_size_body:"normal",
+  typography_style:"editorial",
   color_palette:"tierra",
   show_cabana:"true",
   show_genetics:"true",

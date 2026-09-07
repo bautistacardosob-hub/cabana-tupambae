@@ -242,6 +242,22 @@ test("offers persistent public color palette presets", async () => {
   assert.match(editor, /Vista previa de la paleta/);
 });
 
+test("offers fast persistent typography presets", async () => {
+  const [page, content, styles, admin] = await Promise.all([
+    read("app/page.tsx"),
+    read("lib/template-content.ts"),
+    read("app/globals.css"),
+    read("app/admin-panel.tsx"),
+  ]);
+  assert.match(content, /typography_style:"editorial"/);
+  assert.match(page, /document\.body\.dataset\.typography=content\.typography_style/);
+  assert.match(page, /id:"contemporanea"/);
+  assert.match(styles, /body\[data-typography="clasica"\]/);
+  assert.match(styles, /body\[data-typography="campo"\]/);
+  assert.match(admin, /key:"typography_style"/);
+  assert.doesNotMatch(styles, /@import url\(/);
+});
+
 test("keeps the real cabin identity while the admin reloads", async () => {
   const page = await read("app/page.tsx");
   assert.match(page, /cabana-site-identity-v1/);

@@ -57,6 +57,12 @@ export const colorPalettes=[
   {id:"pampa",name:"Pampa",copy:"Neutra, sobria y contemporánea.",colors:["#30332f","#202520","#efebe2","#8c7456"]},
   {id:"vino",name:"Vino",copy:"Borgoña elegante con acentos suaves.",colors:["#40292b","#2b181b","#f4ebe5","#9d5d50"]}
 ] as const;
+export const typographyPresets=[
+  {id:"editorial",name:"Editorial",copy:"Serif elegante y aire de catálogo premium."},
+  {id:"clasica",name:"Clásica",copy:"Tradicional, refinada y de lectura pausada."},
+  {id:"contemporanea",name:"Contemporánea",copy:"Limpia, directa y completamente sans serif."},
+  {id:"campo",name:"Campo",copy:"Sólida, cálida y con carácter productivo."}
+] as const;
 
 export function findNextAuction(auctions:AuctionRecord[]){
   const today=new Date();today.setHours(0,0,0,0);
@@ -338,10 +344,10 @@ export function SiteApplication({initialScreen="home",initialNewsSlug,initialAni
   const nextAuction=findNextAuction(auctions);
   const draftMode=initialScreen==="admin"||initialPreview;
   useEffect(()=>{
-    if(initialScreen==="admin")delete document.body.dataset.palette;
-    else document.body.dataset.palette=content.color_palette||"tierra";
-    return()=>{delete document.body.dataset.palette};
-  },[content.color_palette,initialScreen]);
+    if(initialScreen==="admin"){delete document.body.dataset.palette;delete document.body.dataset.typography}
+    else{document.body.dataset.palette=content.color_palette||"tierra";document.body.dataset.typography=content.typography_style||"editorial"}
+    return()=>{delete document.body.dataset.palette;delete document.body.dataset.typography};
+  },[content.color_palette,content.typography_style,initialScreen]);
   useEffect(()=>{if(initialScreen!=="admin")return;const cached=readCachedSiteIdentity();if(cached.brandName)setContent(current=>({...current,brand_name:cached.brandName!}));if(cached.logo)setSiteImages(current=>({...current,"brand-logo":cached.logo!}))},[initialScreen]);
   useEffect(()=>{if(initialScreen==="admin"||initialPreview)return;const cached=readCachedPublicSnapshot();const cachedImages=cached.images;if(cached.content)setContent(current=>({...current,...cached.content}));if(cachedImages?.length)setSiteImages(current=>({...current,...Object.fromEntries(cachedImages.map(image=>[image.imageKey,image.url]))}));if(cached.content&&cachedImages?.length)setInitialDataLoaded(true)},[initialScreen,initialPreview]);
   useEffect(()=>{
