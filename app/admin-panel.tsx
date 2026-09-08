@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import type * as React from "react";
 import { readApiJson, uploadFileDirect, uploadImageDirect } from "../lib/client-upload";
+import { createBrowserSupabaseClient } from "../lib/supabase/client";
 import {
   Brand,
   SiteImageContext,
@@ -44,13 +46,13 @@ export default function Admin({ go, animals, categories, updateCategories, aucti
   useEffect(()=>{void fetch("/api/publication").then(async response=>{if(response.ok){const data=await response.json() as {publications?:PublicationRecord[]};setHistory(data.publications??[])}})},[]);
   const publish=async()=>{setPublishing(true);setPublicationMessage("");try{const publication=await publishSite();setHistory(current=>[publication,...current].slice(0,8));setPublicationMessage("✓ Sitio publicado")}catch(cause){setPublicationMessage(cause instanceof Error?cause.message:"No se pudo publicar.")}finally{setPublishing(false)}};
   const restore=async(item:PublicationRecord)=>{if(!window.confirm(`¿Restaurar la versión del ${new Date(item.publishedAt).toLocaleString("es-AR")}?`))return;setPublishing(true);setPublicationMessage("");try{await restorePublication(item.id);setPublicationMessage("✓ Versión restaurada")}catch(cause){setPublicationMessage(cause instanceof Error?cause.message:"No se pudo restaurar.")}finally{setPublishing(false)}};
-  const labels: Record<AdminSection,string> = {resumen:"Resumen",animales:"Animales",categorias:"Categorías",actualidad:"Actualidad",remates:"Remates",consultas:"Consultas",pagina:"Página web",multimedia:"Galería"};
+  const labels: Record<AdminSection,string> = {resumen:"Resumen",animales:"Animales",categorias:"Categorías",actualidad:"Actualidad",remates:"Remates",consultas:"Consultas",pagina:"Página web",multimedia:"Galería",cuenta:"Mi cuenta"};
   const choose=(value:AdminSection)=>{setSection(value);setEditor(undefined);setSaved(false)};
   return <div className="adminShell">
     <aside className="adminSidebar">
       <div className="adminBrand"><Brand/><span>Administrador</span></div>
       <nav aria-label="Secciones del administrador">
-        {(["resumen","animales","categorias","actualidad","remates","consultas","pagina","multimedia"] as AdminSection[]).map((item,i)=><button key={item} className={section===item?"active":""} onClick={()=>choose(item)}><i>{["⌂","♧","≡","◫","◇","✉","▤","▧"][i]}</i>{labels[item]}{item==="animales"&&<b>{animals.length}</b>}</button>)}
+        {(["resumen","animales","categorias","actualidad","remates","consultas","pagina","multimedia","cuenta"] as AdminSection[]).map((item,i)=><button key={item} className={section===item?"active":""} onClick={()=>choose(item)}><i>{["⌂","♧","≡","◫","◇","✉","▤","▧","○"][i]}</i>{labels[item]}{item==="animales"&&<b>{animals.length}</b>}</button>)}
       </nav>
       <div className="adminUser"><span>AD</span><p><b>Administrador</b><small>Acceso protegido</small></p></div>
     </aside>
@@ -65,10 +67,21 @@ export default function Admin({ go, animals, categories, updateCategories, aucti
         {section==="consultas"&&<AdminMessages/>}
         {section==="pagina"&&<PageContent siteImages={siteImages} content={content} updateSiteImage={updateSiteImage} updateContent={updateContent}/>}
         {section==="multimedia"&&<MediaLibrary content={content} updateContent={updateContent}/>}
+        {section==="cuenta"&&<AccountSettings/>}
       </main>
     </div>
     {editor!==undefined&&<AnimalEditor animal={editor} categories={categories} featuredCount={animals.filter(item=>item.featured&&item.id!==editor?.id).length} close={()=>setEditor(undefined)} save={async(value)=>{await saveAnimal(value);setSaved(true);setTimeout(()=>setEditor(undefined),650)}} remove={async()=>{if(editor?.id){await deleteAnimal(editor.id);setEditor(undefined)}}} saved={saved}/>}
   </div>;
+}
+
+function AccountSettings(){
+  const [email,setEmail]=useState("");
+  const [busy,setBusy]=useState(false);
+  const [message,setMessage]=useState("");
+  const [error,setError]=useState("");
+  useEffect(()=>{const load=async()=>{const result=await createBrowserSupabaseClient().auth.getUser();setEmail(result.data.user?.email||"")};void load()},[]);
+  const submit=async(event:React.FormEvent<HTMLFormElement>)=>{event.preventDefault();setBusy(true);setMessage("");setError("");const form=event.currentTarget;const data=new FormData(form);const currentPassword=String(data.get("currentPassword")||"");const password=String(data.get("password")||"");const confirmation=String(data.get("confirmation")||"");if(password.length<8){setError("La contraseña nueva debe tener al menos 8 caracteres.");setBusy(false);return}if(password!==confirmation){setError("Las contraseñas nuevas no coinciden.");setBusy(false);return}const {error:authError}=await createBrowserSupabaseClient().auth.updateUser({password,current_password:currentPassword});if(authError){setError(authError.message.toLowerCase().includes("password")?"No se pudo cambiar la contraseña. Revisá la contraseña actual y volvé a intentarlo.":authError.message);setBusy(false);return}form.reset();setMessage("✓ Contraseña actualizada");setBusy(false)};
+  return <><section className="adminPageHead"><div><p>Seguridad</p><h1>Mi cuenta</h1><span>Cada persona administra la web con su propio usuario.</span></div></section><div className="accountSettingsGrid"><form className="adminPanel passwordPanel" onSubmit={submit}><header><div><h2>Cambiar contraseña</h2><p>{email||"Usuario autenticado"}</p></div></header><div><label>Contraseña actual<input name="currentPassword" type="password" autoComplete="current-password" required/></label><label>Nueva contraseña<input name="password" type="password" autoComplete="new-password" minLength={8} required/><small>Mínimo 8 caracteres.</small></label><label>Repetir nueva contraseña<input name="confirmation" type="password" autoComplete="new-password" minLength={8} required/></label>{error&&<p className="accountError" role="alert">{error}</p>}{message&&<p className="accountSuccess" role="status">{message}</p>}<button disabled={busy}>{busy?"Actualizando...":"Actualizar contraseña"}</button></div></form><section className="adminPanel accessInfoPanel"><header><div><h2>Accesos independientes</h2><p>Protección para la cabaña y su equipo.</p></div></header><div><b>No compartas esta contraseña</b><p>El propietario y el administrador técnico pueden tener usuarios distintos. Cada uno inicia sesión con su propio correo y la contraseña del cliente nunca queda expuesta.</p><span>Los accesos adicionales se asignan únicamente a esta cabaña desde su proyecto de Supabase.</span></div></section></div></>;
 }
 
 function AdminOverview({setSection,openEditor,animals,auctions,content}:{setSection:(s:AdminSection)=>void;openEditor:()=>void;animals:AnimalRecord[];auctions:AuctionRecord[];content:SiteContentMap}) {

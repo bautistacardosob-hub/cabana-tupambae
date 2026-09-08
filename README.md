@@ -39,6 +39,7 @@ npm run client:prepare -- \
   --name "Cabaña Ejemplo" \
   --slug cabana-ejemplo \
   --owner-email cliente@ejemplo.com \
+  --support-email administrador@ejemplo.com \
   --domain ejemplo.com
 ```
 
@@ -58,4 +59,3 @@ Nunca reutilizar `DATABASE_URL`, `SUPABASE_SECRET_KEY`, usuarios ni buckets entr
 ## Publicación
 
 Conectar el repositorio individual de la cabaña a un sitio nuevo de Netlify, cargar las variables indicadas en `netlify.env.example` y desplegar. El proyecto no viene vinculado a ningún sitio de Netlify ni a ninguna base de datos.
-

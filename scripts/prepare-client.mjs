@@ -40,6 +40,7 @@ const metadata = {
   name: args.name,
   slug: args.slug,
   ownerEmail: args["owner-email"],
+  supportEmail: args["support-email"] ?? "",
   domain: args.domain ?? "",
   primaryColor,
   generatedAt: new Date().toISOString(),
@@ -53,6 +54,19 @@ DATABASE_URL=postgresql://postgres.YOUR_PROJECT:REPLACE_ME@YOUR_POOLER_HOST:6543
 NEXT_PUBLIC_CABIN_ID=1
 NEXT_PUBLIC_SITE_URL=${args.domain ? `https://${args.domain}` : "https://YOUR_SITE.netlify.app"}
 `;
+const supportAccess = args["support-email"] ? `
+-- Crear también ${args["support-email"]} en Authentication > Users.
+-- Este usuario técnico tendrá su propia contraseña y no conocerá la del cliente:
+-- insert into public.user_roles (user_id, cabin_id, role)
+-- values ('SUPPORT_AUTH_USER_UUID', 1, 'editor')
+-- on conflict (user_id, cabin_id) do update set role = excluded.role;
+` : `
+-- Acceso técnico opcional: crear otro usuario en Authentication > Users y asignarlo
+-- como editor con su propio UUID. Nunca compartir la contraseña del propietario.
+-- insert into public.user_roles (user_id, cabin_id, role)
+-- values ('SUPPORT_AUTH_USER_UUID', 1, 'editor')
+-- on conflict (user_id, cabin_id) do update set role = excluded.role;
+`;
 const seed = `-- Ejecutar después de todas las migraciones de drizzle-postgres/.
 insert into public.cabins (id, slug, name)
 values (1, ${sqlLiteral(args.slug)}, ${sqlLiteral(args.name)})
@@ -63,6 +77,7 @@ select setval(pg_get_serial_sequence('public.cabins', 'id'), greatest((select ma
 -- insert into public.user_roles (user_id, cabin_id, role)
 -- values ('OWNER_AUTH_USER_UUID', 1, 'owner')
 -- on conflict (user_id, cabin_id) do update set role = excluded.role;
+${supportAccess}
 `;
 const checklist = `# Alta de ${args.name}
 
@@ -71,7 +86,7 @@ Sitio independiente: repositorio, Supabase, Netlify, dominio y /admin propios.
 1. Crear repositorio nuevo desde la plantilla y conectarlo a Netlify.
 2. Crear un proyecto Supabase exclusivo.
 3. Ejecutar en orden drizzle-postgres/*.sql y luego seed.sql.
-4. Crear el propietario indicado en seed.sql.
+4. Crear el propietario y, si corresponde, el administrador técnico indicados en seed.sql. Cada uno debe usar su propia contraseña.
 5. Completar netlify.env.example en Netlify y volver a desplegar.
 6. Verificar /, /admin, login, imágenes, publicación y contacto.
 7. Asociar el dominio y actualizar NEXT_PUBLIC_SITE_URL.

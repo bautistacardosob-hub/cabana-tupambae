@@ -7,7 +7,7 @@ import { readApiJson, uploadFileDirect, uploadImageDirect } from "../lib/client-
 import { optimizedImageUrl } from "../lib/image-url";
 
 export type Screen = "home" | "cabana" | "genetica" | "animal" | "criollos" | "actualidad" | "noticia" | "galeria" | "remate" | "contacto" | "pagina" | "admin";
-export type AdminSection = "resumen" | "animales" | "categorias" | "actualidad" | "remates" | "consultas" | "pagina" | "multimedia";
+export type AdminSection = "resumen" | "animales" | "categorias" | "actualidad" | "remates" | "consultas" | "pagina" | "multimedia" | "cuenta";
 export type PedigreeMember = { id?:number; relation:string; name:string; registration?:string|null; sortOrder?:number };
 export type DepRecord = { id?:number; label:string; value:string; precision?:string|null; percentile?:string|null; sortOrder?:number };
 export type MediaRecord = { id?:number; kind:"image"|"video"; url?:string|null; storageKey?:string|null; externalUrl?:string|null; filename?:string|null; caption?:string|null; sortOrder?:number };

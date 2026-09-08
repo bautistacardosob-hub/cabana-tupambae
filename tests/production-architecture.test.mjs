@@ -309,3 +309,20 @@ test("keeps sold animals visible and gives each one a personalized inquiry link"
   assert.match(page, /\/genetica#catalogo-animales/);
   assert.match(page, /a\.sold&&<span className="soldBadge">Vendido<\/span>/);
 });
+
+test("lets each administrator change their own password and separates technical access", async () => {
+  const [page, admin, migration, generator] = await Promise.all([
+    read("app/page.tsx"),
+    read("app/admin-panel.tsx"),
+    read("drizzle-postgres/0010_separate_owner_and_support_access.sql"),
+    read("scripts/prepare-client.mjs"),
+  ]);
+  assert.match(page, /\| "cuenta"/);
+  assert.match(admin, /createBrowserSupabaseClient\(\)\.auth\.updateUser/);
+  assert.match(admin, /current_password:currentPassword/);
+  assert.match(admin, /Accesos independientes/);
+  assert.match(migration, /private\.is_cabin_owner/);
+  assert.match(migration, /and role = 'owner'/);
+  assert.match(generator, /support-email/);
+  assert.match(generator, /SUPPORT_AUTH_USER_UUID/);
+});
