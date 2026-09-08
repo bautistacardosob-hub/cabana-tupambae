@@ -27,6 +27,7 @@ export type AnimalRecord = {
   id?: number; name: string; type: string; rp: string; breed: string; image: string;
   status: "published" | "draft"; featured: boolean; sold: boolean; birthDate?: string | null;
   coat?: string | null; registration?: string | null; description?: string | null;
+  geneticsProviderName?: string | null; geneticsProviderUrl?: string | null;
   introTitle?: string; introEmphasis?: string; introSecondary?: string;
   pedigreeTitle?: string; pedigreeEmphasis?: string; pedigreeDescription?: string;
   birthWeight?: string | null; weaningWeight?: string | null;
@@ -92,6 +93,15 @@ function animalInquiryUrl(whatsapp:string,phone:string,animal:AnimalRecord){
   }catch{}
   const rawPhone=raw.replace(/\D/g,"");
   return rawPhone?`https://wa.me/${rawPhone}?text=${encodeURIComponent(message)}`:"";
+}
+
+function safeExternalUrl(value?:string|null){
+  const raw=value?.trim();
+  if(!raw)return "";
+  try{
+    const url=new URL(/^https?:\/\//i.test(raw)?raw:`https://${raw}`);
+    return url.protocol==="http:"||url.protocol==="https:"?url.toString():"";
+  }catch{return ""}
 }
 
 export function Brand({ dark = false }: { dark?: boolean }) {
@@ -289,9 +299,11 @@ function AnimalDetail({ go, animal, siteImages, loaded=true }: { go: (s: Screen)
   const imageClasses=["galleryMain","galleryTop","galleryBottom"];
   const showBrand=isVisible(content,"show_animal_watermark");
   const inquiryUrl=animalInquiryUrl(content.contact_whatsapp||"",content.contact_phone||"",animal);
+  const geneticsProviderUrl=safeExternalUrl(animal.geneticsProviderUrl);
 
   return <div className="detailPage"><section className="detailHero" style={{backgroundImage:`url(${optimizedImageUrl(animal.image,1920)})`}}><Header screen="animal" go={go}/><div className="detailOverlay"/><button className="backButton" onClick={()=>window.location.assign("/genetica#catalogo-animales")}>← Volver al catálogo</button><div className="detailTitle">{animal.sold&&<span className="soldBadge soldBadgeDetail">Vendido</span>}<p className="eyebrow">{animal.type} · {animal.breed}</p><h1>{first}<br/><em>{rest}</em></h1><div className="heroFacts"><span><small>RP</small>{animal.rp}</span><span><small>Nacimiento</small>{animal.birthDate||"Sin dato"}</span><span><small>Pelaje</small>{animal.coat||"Sin dato"}</span></div></div><div className="imageCounter">01 <i/> 04</div></section><section className="detailIntro"><div><p className="sectionNumber">01 — El ejemplar</p>{(animal.introTitle||animal.introEmphasis)&&<h2>{animal.introTitle}{animal.introTitle&&animal.introEmphasis&&<br/>}{animal.introEmphasis&&<em>{animal.introEmphasis}</em>}</h2>}</div><div className="description">{animal.description&&<p>{animal.description}</p>}{animal.introSecondary&&<p>{animal.introSecondary}</p>}{inquiryUrl&&<a className="animalInquiry" href={inquiryUrl} target="_blank" rel="noreferrer">{animal.sold?"Consultar por animales similares":"Consultar por este animal"} <span>↗</span></a>}</div>
 {showBrand&&<div className="animalBrandWatermark" aria-hidden="true"><img src={siteImages["brand-watermark"]||defaultSiteImages["brand-watermark"]} alt=""/></div>}
+{geneticsProviderUrl&&<aside className="geneticsProvider"><div><p className="sectionNumber">Disponibilidad genética</p><h2>Semen y embriones<br/><em>disponibles.</em></h2></div><div className="geneticsProviderInfo"><span>Centro responsable</span><strong>{animal.geneticsProviderName||"Centro de genética"}</strong><p>Consultá disponibilidad, condiciones comerciales y forma de compra directamente con el centro.</p><a href={geneticsProviderUrl} target="_blank" rel="noopener noreferrer">Ver disponibilidad en el centro <span>↗</span></a></div></aside>}
 </section><section className="dataBand"><div><small>Registro</small><b>{animal.registration||"Sin dato"}</b></div><div><small>Peso al nacer</small><b>{animal.birthWeight||"—"}</b></div><div><small>Peso al destete</small><b>{animal.weaningWeight||"—"}</b></div><div><small>Circ. escrotal</small><b>{animal.scrotalCircumference||"—"}</b></div><div><small>Frame</small><b>{animal.frame||"—"}</b></div></section><section className="pedigreeSection"><div className="sectionTop"><div><p className="sectionNumber">02 — Linaje</p>{(animal.pedigreeTitle||animal.pedigreeEmphasis)&&<h2>{animal.pedigreeTitle}{animal.pedigreeTitle&&animal.pedigreeEmphasis&&<br/>}{animal.pedigreeEmphasis&&<em>{animal.pedigreeEmphasis}</em>}</h2>}</div>{animal.pedigreeDescription&&<p>{animal.pedigreeDescription}</p>}</div><Pedigree animal={animal}/></section>{Boolean(animal.deps?.length)&&<section className="depsSection"><div className="depsIntro"><p className="sectionNumber">03 — Información genética</p><h2>Datos que<br/><em>acompañan la mirada.</em></h2><p>Valores expresados como DEPs. Cada cabaña puede configurar las características que publica.</p></div><div className="depsTable"><div className="depsHeader"><span>Característica</span><span>DEP</span><span>Prec.</span><span>Percentil</span></div>{animal.deps!.map((d,i)=><div className="depRow" key={`${d.label}-${i}`}><b>{d.label}</b><span>{d.value}</span><span>{d.precision||"—"}</span><span className="percent"><i style={{width:`${Math.max(18,85-i*9)}%`}}/>{d.percentile||"—"}</span></div>)}</div></section>}{Boolean(uploadedImages.length||video)&&<section className="gallerySection"><div className="sectionTop"><div><p className="sectionNumber">04 — Galería</p><h2>{video?<>Ver al animal<br/><em>en movimiento.</em></>:<>Galería<br/><em>del animal.</em></>}</h2></div></div>{video&&<div className="animalVideoPlayer">{videoEmbed?<iframe src={videoEmbed} title={`Video de ${animal.name}`} allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowFullScreen/>:directVideo?<video src={video} controls playsInline preload="metadata"/>:<a href={video} target="_blank" rel="noreferrer"><span>▶</span> Abrir video</a>}</div>}{visibleGallery.length>0&&<div className={`galleryGrid galleryCount${visibleGallery.length}`}>{visibleGallery.map((image,index)=><div key={`${image}-${index}`} className={`galleryImage ${imageClasses[index]}`} style={{backgroundImage:`url(${image})`}}>{index===visibleGallery.length-1&&<span>{String(visibleGallery.length).padStart(2,"0")} / {String(uploadedImages.length).padStart(2,"0")}</span>}</div>)}</div>}</section>}<Footer go={go}/></div>;
 }
 

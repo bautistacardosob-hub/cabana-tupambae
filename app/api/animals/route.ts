@@ -20,6 +20,25 @@ function message(error: unknown) {
   return `${text}\nCódigo de conexión: ${code}`;
 }
 
+class InputError extends Error {}
+
+function optionalExternalUrl(value: unknown) {
+  const raw = typeof value === "string" ? value.trim() : "";
+  if (!raw) return null;
+  try {
+    const url = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`);
+    if (url.protocol !== "http:" && url.protocol !== "https:") throw new Error();
+    return url.toString();
+  } catch {
+    throw new InputError("El enlace del centro de genética no es válido.");
+  }
+}
+
+function writeError(error: unknown) {
+  if (error instanceof InputError) return Response.json({ error: error.message }, { status: 400 });
+  return Response.json({ error: message(error) }, { status: 500 });
+}
+
 function clean(payload: Record<string, unknown>) {
   const value = (key: string) => typeof payload[key] === "string" ? payload[key].trim() : "";
   const editorial = (key: string, fallback: string) => key in payload ? String(payload[key] ?? "").trim() : fallback;
@@ -32,6 +51,8 @@ function clean(payload: Record<string, unknown>) {
     coat: value("coat") || null,
     registration: value("registration") || null,
     description: value("description") || null,
+    geneticsProviderName: value("geneticsProviderName") || null,
+    geneticsProviderUrl: optionalExternalUrl(payload.geneticsProviderUrl),
     introTitle: editorial("introTitle", "Potencia, estructura"),
     introEmphasis: editorial("introEmphasis", "y corrección."),
     introSecondary: editorial("introSecondary", "Su pedigree reúne líneas probadas de nuestro programa genético con referentes internacionales de la raza."),
@@ -107,7 +128,7 @@ export async function GET(request:Request) {
     const rows = await db.select().from(animals).where(all?eq(animals.cabinId,cabinId):and(eq(animals.cabinId,cabinId),eq(animals.status,"published"))).orderBy(desc(animals.featured), desc(animals.updatedAt));
     return Response.json({ animals: await addDetails(db, rows) });
   } catch (error) {
-    return Response.json({ error: message(error) }, { status: 500 });
+    return writeError(error);
   }
 }
 
@@ -125,7 +146,7 @@ export async function POST(request: Request) {
     const [enriched] = await addDetails(db, [animal]);
     return Response.json({ animal: enriched }, { status: 201 });
   } catch (error) {
-    return Response.json({ error: message(error) }, { status: 500 });
+    return writeError(error);
   }
 }
 
@@ -145,7 +166,7 @@ export async function PATCH(request: Request) {
     const [enriched] = await addDetails(db, [animal]);
     return Response.json({ animal: enriched });
   } catch (error) {
-    return Response.json({ error: message(error) }, { status: 500 });
+    return writeError(error);
   }
 }
 

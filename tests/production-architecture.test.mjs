@@ -326,3 +326,23 @@ test("lets each administrator change their own password and separates technical 
   assert.match(generator, /support-email/);
   assert.match(generator, /SUPPORT_AUTH_USER_UUID/);
 });
+
+
+test("supports an optional genetics center link per animal", async () => {
+  const [page, admin, schema, route, migration] = await Promise.all([
+    read("app/page.tsx"),
+    read("app/admin-panel.tsx"),
+    read("db/schema.ts"),
+    read("app/api/animals/route.ts"),
+    read("drizzle-postgres/0011_animal_genetics_provider_link.sql"),
+  ]);
+  assert.match(schema, /geneticsProviderName: text\("genetics_provider_name"\)/);
+  assert.match(schema, /geneticsProviderUrl: text\("genetics_provider_url"\)/);
+  assert.match(route, /geneticsProviderUrl: optionalExternalUrl\(payload\.geneticsProviderUrl\)/);
+  assert.match(route, /El enlace del centro de genética no es válido/);
+  assert.match(admin, /name="geneticsProviderName"/);
+  assert.match(admin, /name="geneticsProviderUrl"/);
+  assert.match(page, /geneticsProviderUrl&&<aside className="geneticsProvider"/);
+  assert.match(page, /Ver disponibilidad en el centro/);
+  assert.match(migration, /add column if not exists genetics_provider_url text/);
+});

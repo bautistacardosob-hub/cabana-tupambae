@@ -358,6 +358,8 @@ function AnimalEditor({
         coat: String(data.get("coat") || ""),
         registration: String(data.get("registration") || ""),
         description: String(data.get("description") || ""),
+        geneticsProviderName: String(data.get("geneticsProviderName") || ""),
+        geneticsProviderUrl: String(data.get("geneticsProviderUrl") || ""),
         image: primaryImage,
         birthWeight: String(data.get("birthWeight") || ""),
         weaningWeight: String(data.get("weaningWeight") || ""),
@@ -563,6 +565,26 @@ function AnimalEditor({
                 placeholder="Descripción breve del ejemplar..."
               />
             </label>
+            <label>
+              Centro de genética
+              <input
+                name="geneticsProviderName"
+                defaultValue={animal?.geneticsProviderName || ""}
+                placeholder="Nombre del centro"
+              />
+            </label>
+            <label>
+              Enlace de venta o catálogo
+              <input
+                name="geneticsProviderUrl"
+                inputMode="url"
+                defaultValue={animal?.geneticsProviderUrl || ""}
+                placeholder="https://centrodegenetica.com/animal"
+              />
+            </label>
+            <p className="fieldHelp fullField">
+              Opcional. Si cargás un enlace, la ficha mostrará dónde consultar semen, embriones y condiciones comerciales.
+            </p>
             <label>
               Título editorial
               <input
