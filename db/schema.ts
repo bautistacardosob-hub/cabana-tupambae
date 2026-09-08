@@ -31,6 +31,7 @@ export const animals = pgTable("animals", {
   description: text("description"),
   geneticsProviderName: text("genetics_provider_name"),
   geneticsProviderUrl: text("genetics_provider_url"),
+  catalogSection: text("catalog_section", { enum: ["genetics", "criollos"] }).notNull().default("genetics"),
   introTitle: text("intro_title").notNull().default("Potencia, estructura"),
   introEmphasis: text("intro_emphasis").notNull().default("y corrección."),
   introSecondary: text("intro_secondary").notNull().default("Su pedigree reúne líneas probadas de nuestro programa genético con referentes internacionales de la raza."),

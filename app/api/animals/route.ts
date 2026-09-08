@@ -53,6 +53,7 @@ function clean(payload: Record<string, unknown>) {
     description: value("description") || null,
     geneticsProviderName: value("geneticsProviderName") || null,
     geneticsProviderUrl: optionalExternalUrl(payload.geneticsProviderUrl),
+    catalogSection: payload.catalogSection === "criollos" ? "criollos" as const : "genetics" as const,
     introTitle: editorial("introTitle", "Potencia, estructura"),
     introEmphasis: editorial("introEmphasis", "y corrección."),
     introSecondary: editorial("introSecondary", "Su pedigree reúne líneas probadas de nuestro programa genético con referentes internacionales de la raza."),
@@ -115,8 +116,8 @@ async function addDetails(db: ReturnType<typeof getDb>, rows: Array<typeof anima
   }));
 }
 
-async function hasFeaturedSlot(db: ReturnType<typeof getDb>, currentId?: number) {
-  const rows = await db.select({ id: animals.id }).from(animals).where(and(eq(animals.cabinId, cabinId), eq(animals.featured, true)));
+async function hasFeaturedSlot(db: ReturnType<typeof getDb>, catalogSection: "genetics" | "criollos", currentId?: number) {
+  const rows = await db.select({ id: animals.id }).from(animals).where(and(eq(animals.cabinId, cabinId), eq(animals.catalogSection, catalogSection), eq(animals.featured, true)));
   return rows.filter((row) => row.id !== currentId).length < 2;
 }
 
@@ -140,7 +141,7 @@ export async function POST(request: Request) {
     const payload = clean(body);
     if (!payload.name || !payload.rp) return Response.json({ error: "Nombre y RP son obligatorios." }, { status: 400 });
     const db = getDb();
-    if (payload.featured && !await hasFeaturedSlot(db)) return Response.json({ error: "Solo podés mostrar dos animales en Inicio." }, { status: 409 });
+    if (payload.featured && !await hasFeaturedSlot(db, payload.catalogSection)) return Response.json({ error: "Solo podés destacar dos animales por catálogo. Solo podés mostrar dos animales en Inicio por catálogo." }, { status: 409 });
     const [animal] = await db.insert(animals).values({ cabinId, ...payload }).returning();
     await replaceDetails(db, animal.id, body);
     const [enriched] = await addDetails(db, [animal]);
@@ -159,7 +160,7 @@ export async function PATCH(request: Request) {
     const payload = clean(body);
     if (!id || !payload.name || !payload.rp) return Response.json({ error: "Ficha inválida." }, { status: 400 });
     const db = getDb();
-    if (payload.featured && !await hasFeaturedSlot(db, id)) return Response.json({ error: "Solo podés mostrar dos animales en Inicio." }, { status: 409 });
+    if (payload.featured && !await hasFeaturedSlot(db, payload.catalogSection, id)) return Response.json({ error: "Solo podés destacar dos animales por catálogo. Solo podés mostrar dos animales en Inicio por catálogo." }, { status: 409 });
     const [animal] = await db.update(animals).set(payload).where(eq(animals.id, id)).returning();
     if (!animal) return Response.json({ error: "Animal no encontrado." }, { status: 404 });
     await replaceDetails(db, id, body);

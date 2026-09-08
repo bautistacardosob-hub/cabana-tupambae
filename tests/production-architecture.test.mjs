@@ -346,3 +346,20 @@ test("supports an optional genetics center link per animal", async () => {
   assert.match(page, /Ver disponibilidad en el centro/);
   assert.match(migration, /add column if not exists genetics_provider_url text/);
 });
+
+test("supports Criollos as an independent animal catalog", async () => {
+  const [page, admin, schema, route, migration] = await Promise.all([
+    read("app/page.tsx"),
+    read("app/admin-panel.tsx"),
+    read("db/schema.ts"),
+    read("app/api/animals/route.ts"),
+    read("drizzle-postgres/0012_animal_catalog_section.sql"),
+  ]);
+  assert.match(schema, /catalogSection: text\("catalog_section"/);
+  assert.match(route, /catalogSection: payload\.catalogSection === "criollos"/);
+  assert.match(admin, /Criollos en venta/);
+  assert.match(page, /catalogo-criollos/);
+  assert.match(page, /animal\.catalogSection==="criollos"/);
+  assert.match(page, /window\.location\.assign\(catalogUrl\)/);
+  assert.match(migration, /default 'genetics'/);
+});

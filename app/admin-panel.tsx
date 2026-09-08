@@ -60,7 +60,7 @@ export default function Admin({ go, animals, categories, updateCategories, aucti
       <header className="adminTopbar"><div><small>{content.brand_name}</small><strong>{labels[section]}</strong></div><div className="adminTopActions"><span className={`adminAutosave ${publicationPending?"pending":""}`}>{publicationMessage||(publicationPending?"● Hay cambios sin publicar":"✓ Sitio actualizado")}</span><button className="previewSite" onClick={()=>window.open("/preview","_blank")}>↗ Vista previa</button><details className="publishHistory"><summary>Versiones</summary><div>{history.length?history.map(item=><button key={item.id} disabled={publishing} onClick={()=>void restore(item)}><b>{new Date(item.publishedAt).toLocaleDateString("es-AR")}</b><span>{new Date(item.publishedAt).toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"})}</span></button>):<p>Todavía no hay versiones guardadas.</p>}</div></details><button className="publishSite" disabled={publishing||!publicationPending} onClick={()=>void publish()}>{publishing?"Publicando...":"Publicar cambios"}</button><button className="previewSite" onClick={()=>window.location.assign("/auth/signout")}>Cerrar sesión</button></div></header>
       <main className="adminMain">
         {section==="resumen"&&<AdminOverview setSection={choose} openEditor={()=>setEditor(null)} animals={animals} auctions={auctions} content={content}/>}
-        {section==="animales"&&<AdminAnimals openEditor={setEditor} animals={animals}/>} 
+        {section==="animales"&&<AdminAnimals openEditor={setEditor} animals={animals}/>}
         {section==="categorias"&&<AdminCategories categories={categories} update={updateCategories}/>}
         {section==="actualidad"&&<AdminNews content={content} updateContent={updateContent}/>}
         {section==="remates"&&<><AuctionHomePosition content={content} updateContent={updateContent}/><AdminAuctions auctions={auctions} save={saveAuction} remove={deleteAuction}/></>}
@@ -70,7 +70,7 @@ export default function Admin({ go, animals, categories, updateCategories, aucti
         {section==="cuenta"&&<AccountSettings/>}
       </main>
     </div>
-    {editor!==undefined&&<AnimalEditor animal={editor} categories={categories} featuredCount={animals.filter(item=>item.featured&&item.id!==editor?.id).length} close={()=>setEditor(undefined)} save={async(value)=>{await saveAnimal(value);setSaved(true);setTimeout(()=>setEditor(undefined),650)}} remove={async()=>{if(editor?.id){await deleteAnimal(editor.id);setEditor(undefined)}}} saved={saved}/>}
+    {editor!==undefined&&<AnimalEditor animal={editor} categories={categories} featuredCount={animals.filter(item=>item.featured&&item.catalogSection===(editor?.catalogSection||"genetics")&&item.id!==editor?.id).length} close={()=>setEditor(undefined)} save={async(value)=>{await saveAnimal(value);setSaved(true);setTimeout(()=>setEditor(undefined),650)}} remove={async()=>{if(editor?.id){await deleteAnimal(editor.id);setEditor(undefined)}}} saved={saved}/>}
   </div>;
 }
 
@@ -209,6 +209,7 @@ function AnimalEditor({
   const [publishing, setPublishing] = useState(animal?.status === "published");
   const [featured, setFeatured] = useState(Boolean(animal?.featured));
   const [sold, setSold] = useState(Boolean(animal?.sold));
+  const [catalogSection, setCatalogSection] = useState<"genetics" | "criollos">(animal?.catalogSection === "criollos" ? "criollos" : "genetics");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [tab, setTab] = useState<"info" | "pedigree" | "deps" | "gallery">(
@@ -360,6 +361,7 @@ function AnimalEditor({
         description: String(data.get("description") || ""),
         geneticsProviderName: String(data.get("geneticsProviderName") || ""),
         geneticsProviderUrl: String(data.get("geneticsProviderUrl") || ""),
+        catalogSection,
         image: primaryImage,
         birthWeight: String(data.get("birthWeight") || ""),
         weaningWeight: String(data.get("weaningWeight") || ""),
@@ -456,6 +458,13 @@ function AnimalEditor({
           </div>
           <input type="hidden" name="image" value={primaryImage} />
           <div className="fieldGrid">
+            <label className="fullField">
+              Catálogo de venta
+              <select value={catalogSection} onChange={(event) => setCatalogSection(event.target.value as "genetics" | "criollos")}>
+                <option value="genetics">Genética bovina</option>
+                <option value="criollos">Criollos en venta</option>
+              </select>
+            </label>
             <label>
               Nombre del animal
               <input
@@ -643,16 +652,16 @@ function AnimalEditor({
           </div>
           <div className="visibilityBox featuredBox">
             <div>
-              <b>Mostrar en Inicio</b>
+              <b>{catalogSection === "genetics" ? "Mostrar en Inicio" : "Destacar en Criollos"}</b>
               <small>
-                Elegí hasta dos animales para la portada. Si ninguno está seleccionado, se usan los dos primeros publicados.
+                {catalogSection === "genetics" ? "Elegí hasta dos animales para la portada. Si ninguno está seleccionado, se usan los dos primeros publicados." : "Los criollos destacados aparecen primero dentro de su catálogo."}
               </small>
             </div>
             <button
               type="button"
               onClick={() => {
                 if (!featured && featuredCount >= 2) {
-                  setError("Ya hay dos animales seleccionados para Inicio. Desmarcá uno antes de elegir otro.");
+                  setError("Ya hay dos animales destacados en este catálogo. Desmarcá uno antes de elegir otro.");
                   return;
                 }
                 setError("");
