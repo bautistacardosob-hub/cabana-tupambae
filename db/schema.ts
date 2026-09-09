@@ -46,6 +46,14 @@ export const animals = pgTable("animals", {
   weaningWeight: text("weaning_weight"),
   scrotalCircumference: text("scrotal_circumference"),
   frame: text("frame"),
+  rpLabel: text("rp_label"),
+  birthDateLabel: text("birth_date_label"),
+  coatLabel: text("coat_label"),
+  registrationLabel: text("registration_label"),
+  birthWeightLabel: text("birth_weight_label"),
+  weaningWeightLabel: text("weaning_weight_label"),
+  scrotalCircumferenceLabel: text("scrotal_circumference_label"),
+  frameLabel: text("frame_label"),
   createdAt: timestamp("created_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true, mode: "string" }).notNull().defaultNow(),
 }, (table) => [
@@ -157,7 +165,9 @@ export const animalCategories = pgTable("animal_categories", {
   slug: text("slug").notNull(),
   sortOrder: integer("sort_order").notNull().default(0),
   active: boolean("active").notNull().default(true),
-}, (table) => [uniqueIndex("idx_animal_categories_cabin_slug").on(table.cabinId, table.slug)]);
+  catalogSection: text("catalog_section", { enum: ["genetics", "criollos"] }).notNull().default("genetics"),
+  kind: text("kind", { enum: ["category", "coat"] }).notNull().default("category"),
+}, (table) => [uniqueIndex("idx_animal_categories_scope_slug").on(table.cabinId, table.catalogSection, table.kind, table.slug)]);
 
 export const galleryMedia = pgTable("gallery_media", {
   id: serial("id").primaryKey(),

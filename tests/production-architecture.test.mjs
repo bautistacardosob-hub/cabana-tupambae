@@ -363,3 +363,19 @@ test("supports Criollos as an independent animal catalog", async () => {
   assert.match(page, /window\.location\.assign\(catalogUrl\)/);
   assert.match(migration, /default 'genetics'/);
 });
+
+test("separates cattle and Criollo taxonomies and supports custom animal labels", async () => {
+  const [page, admin, schema, categories, migration] = await Promise.all([
+    read("app/page.tsx"), read("app/admin-panel.tsx"), read("db/schema.ts"),
+    read("app/api/categories/route.ts"), read("drizzle-postgres/0013_separate_animal_taxonomies_and_labels.sql"),
+  ]);
+  assert.match(schema, /kind: text\("kind"/);
+  assert.match(schema, /rpLabel: text\("rp_label"\)/);
+  assert.match(categories, /body\.kind==="coat"/);
+  assert.match(admin, /Categorías y pelajes/);
+  assert.match(admin, /section === "criollos" \? "Marcha" : "Circ\. escrotal"/);
+  assert.match(page, /animal\.registrationLabel\?\?"Registro"/);
+  assert.match(page, /horse\?"Información adicional":"Información genética"/);
+  assert.match(migration, /'Alazán', 'alazan'/);
+  assert.match(migration, /idx_animal_categories_scope_slug/);
+});

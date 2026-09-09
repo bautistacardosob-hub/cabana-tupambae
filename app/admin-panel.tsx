@@ -110,18 +110,20 @@ function AnimalRows({animals,compact=false,openEditor}:{animals:AnimalRecord[];c
 function AdminAnimals({openEditor,animals}:{openEditor:(animal:AnimalRecord|null)=>void;animals:AnimalRecord[]}) {
   const [query,setQuery]=useState("");
   const [status,setStatus]=useState<"all"|"published"|"draft">("all");
+  const [catalog,setCatalog]=useState<"genetics"|"criollos">("genetics");
   const [category,setCategory]=useState("all");
   const [page,setPage]=useState(1);
   const pageSize=8;
-  const published=animals.filter(a=>a.status==="published").length;
-  const categories=[...new Set(animals.map(animal=>animal.type).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
+  const catalogAnimals=animals.filter(animal=>(animal.catalogSection||"genetics")===catalog);
+  const published=catalogAnimals.filter(a=>a.status==="published").length;
+  const categories=[...new Set(catalogAnimals.map(animal=>animal.type).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"es"));
   const normalized=query.trim().toLocaleLowerCase("es");
-  const filtered=animals.filter(animal=>(status==="all"||animal.status===status)&&(category==="all"||animal.type===category)&&(!normalized||[animal.name,animal.rp,animal.breed,animal.type].some(value=>value.toLocaleLowerCase("es").includes(normalized))));
+  const filtered=catalogAnimals.filter(animal=>(status==="all"||animal.status===status)&&(category==="all"||animal.type===category)&&(!normalized||[animal.name,animal.rp,animal.breed,animal.type].some(value=>value.toLocaleLowerCase("es").includes(normalized))));
   const pages=Math.max(1,Math.ceil(filtered.length/pageSize));
   const currentPage=Math.min(page,pages);
   const visible=filtered.slice((currentPage-1)*pageSize,currentPage*pageSize);
   const changeStatus=(value:"all"|"published"|"draft")=>{setStatus(value);setPage(1)};
-  return <><section className="adminPageHead"><div><p>Catálogo genético</p><h1>Animales</h1><span>Gestioná las fichas que aparecen en la página web.</span></div><button onClick={()=>openEditor(null)}>＋ Agregar animal</button></section><section className="adminPanel animalsPanel"><div className="tableTools"><label>⌕ <input aria-label="Buscar animales" placeholder="Buscar por nombre, RP, raza..." value={query} onChange={e=>{setQuery(e.target.value);setPage(1)}}/></label><div><button className={status==="all"?"selected":""} onClick={()=>changeStatus("all")}>Todos {animals.length}</button><button className={status==="published"?"selected":""} onClick={()=>changeStatus("published")}>Publicados {published}</button><button className={status==="draft"?"selected":""} onClick={()=>changeStatus("draft")}>Borradores {animals.length-published}</button></div><select aria-label="Filtrar por categoría" value={category} onChange={e=>{setCategory(e.target.value);setPage(1)}}><option value="all">Todas las categorías</option>{categories.map(item=><option key={item}>{item}</option>)}</select></div>{visible.length?<AnimalRows animals={visible} openEditor={openEditor}/>:<div className="animalSearchEmpty"><span>⌕</span><b>No encontramos animales</b><small>Probá con otra búsqueda o cambiá los filtros.</small></div>}<footer className="tableFooter"><span>Mostrando {visible.length} de {filtered.length} animales</span><div><button disabled={currentPage===1} onClick={()=>setPage(value=>Math.max(1,value-1))}>←</button><b>{currentPage} / {pages}</b><button disabled={currentPage===pages} onClick={()=>setPage(value=>Math.min(pages,value+1))}>→</button></div></footer></section></>
+  return <><section className="adminPageHead"><div><p>Catálogos</p><h1>Animales</h1><span>Gestioná ganado y caballos Criollos por separado.</span></div><button onClick={()=>openEditor(null)}>＋ Agregar animal</button></section><section className="adminPanel animalsPanel"><div className="categoryScope"><button className={catalog==="genetics"?"active":""} onClick={()=>{setCatalog("genetics");setCategory("all");setPage(1)}}>Ganado</button><button className={catalog==="criollos"?"active":""} onClick={()=>{setCatalog("criollos");setCategory("all");setPage(1)}}>Criollos</button></div><div className="tableTools"><label>⌕ <input aria-label="Buscar animales" placeholder="Buscar por nombre, RP, raza..." value={query} onChange={e=>{setQuery(e.target.value);setPage(1)}}/></label><div><button className={status==="all"?"selected":""} onClick={()=>changeStatus("all")}>Todos {catalogAnimals.length}</button><button className={status==="published"?"selected":""} onClick={()=>changeStatus("published")}>Publicados {published}</button><button className={status==="draft"?"selected":""} onClick={()=>changeStatus("draft")}>Borradores {catalogAnimals.length-published}</button></div><select aria-label="Filtrar por categoría" value={category} onChange={e=>{setCategory(e.target.value);setPage(1)}}><option value="all">Todas las categorías</option>{categories.map(item=><option key={item}>{item}</option>)}</select></div>{visible.length?<AnimalRows animals={visible} openEditor={openEditor}/>:<div className="animalSearchEmpty"><span>⌕</span><b>No encontramos animales</b><small>Probá con otra búsqueda o cambiá los filtros.</small></div>}<footer className="tableFooter"><span>Mostrando {visible.length} de {filtered.length} animales</span><div><button disabled={currentPage===1} onClick={()=>setPage(value=>Math.max(1,value-1))}>←</button><b>{currentPage} / {pages}</b><button disabled={currentPage===pages} onClick={()=>setPage(value=>Math.min(pages,value+1))}>→</button></div></footer></section></>
 }
 
 function AuctionHomePosition({content,updateContent}:{content:SiteContentMap;updateContent:(values:SiteContentMap)=>void}){
@@ -206,10 +208,28 @@ function AnimalEditor({
   remove: () => Promise<void>;
   saved: boolean;
 }) {
+  const labelDefaults = (section: "genetics" | "criollos") => ({
+    rpLabel: "RP", birthDateLabel: "Nacimiento", coatLabel: "Pelaje", registrationLabel: "Registro",
+    birthWeightLabel: section === "criollos" ? "Sexo" : "Peso al nacer",
+    weaningWeightLabel: section === "criollos" ? "Categoría" : "Peso al destete",
+    scrotalCircumferenceLabel: section === "criollos" ? "Marcha" : "Circ. escrotal",
+    frameLabel: section === "criollos" ? "Estado" : "Frame",
+  });
   const [publishing, setPublishing] = useState(animal?.status === "published");
   const [featured, setFeatured] = useState(Boolean(animal?.featured));
   const [sold, setSold] = useState(Boolean(animal?.sold));
   const [catalogSection, setCatalogSection] = useState<"genetics" | "criollos">(animal?.catalogSection === "criollos" ? "criollos" : "genetics");
+  const initialLabels = labelDefaults(animal?.catalogSection === "criollos" ? "criollos" : "genetics");
+  const [fieldLabels, setFieldLabels] = useState({
+    rpLabel: animal?.rpLabel ?? initialLabels.rpLabel,
+    birthDateLabel: animal?.birthDateLabel ?? initialLabels.birthDateLabel,
+    coatLabel: animal?.coatLabel ?? initialLabels.coatLabel,
+    registrationLabel: animal?.registrationLabel ?? initialLabels.registrationLabel,
+    birthWeightLabel: animal?.birthWeightLabel ?? initialLabels.birthWeightLabel,
+    weaningWeightLabel: animal?.weaningWeightLabel ?? initialLabels.weaningWeightLabel,
+    scrotalCircumferenceLabel: animal?.scrotalCircumferenceLabel ?? initialLabels.scrotalCircumferenceLabel,
+    frameLabel: animal?.frameLabel ?? initialLabels.frameLabel,
+  });
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [tab, setTab] = useState<"info" | "pedigree" | "deps" | "gallery">(
@@ -367,6 +387,7 @@ function AnimalEditor({
         weaningWeight: String(data.get("weaningWeight") || ""),
         scrotalCircumference: String(data.get("scrotalCircumference") || ""),
         frame: String(data.get("frame") || ""),
+        ...fieldLabels,
         status,
         featured,
         sold,
@@ -424,7 +445,7 @@ function AnimalEditor({
             onClick={() => setTab("deps")}
             className={tab === "deps" ? "active" : ""}
           >
-            DEPs <span>{deps.length}</span>
+            {catalogSection === "criollos" ? "Datos adicionales" : "DEPs"} <span>{deps.length}</span>
           </button>
           <button
             type="button"
@@ -460,7 +481,7 @@ function AnimalEditor({
           <div className="fieldGrid">
             <label className="fullField">
               Catálogo de venta
-              <select value={catalogSection} onChange={(event) => setCatalogSection(event.target.value as "genetics" | "criollos")}>
+              <select value={catalogSection} onChange={(event) => {const next=event.target.value as "genetics"|"criollos";const previous=labelDefaults(catalogSection);const defaults=labelDefaults(next);setCatalogSection(next);setFieldLabels(current=>Object.fromEntries(Object.entries(current).map(([key,value])=>[key,value===previous[key as keyof typeof previous]?defaults[key as keyof typeof defaults]:value])) as typeof current)}}>
                 <option value="genetics">Genética bovina</option>
                 <option value="criollos">Criollos en venta</option>
               </select>
@@ -489,16 +510,16 @@ function AnimalEditor({
                 name="type"
                 defaultValue={
                   animal?.type ||
-                  categories.find((item) => item.active)?.name ||
+                  categories.find((item) => item.active && item.kind !== "coat" && (item.catalogSection || "genetics") === catalogSection)?.name ||
                   "Sin categoría"
                 }
               >
                 {animal?.type &&
-                  !categories.some((item) => item.name === animal.type) && (
+                  !categories.some((item) => item.name === animal.type && item.kind !== "coat" && (item.catalogSection || "genetics") === catalogSection) && (
                     <option>{animal.type}</option>
                   )}
                 {categories
-                  .filter((item) => item.active)
+                  .filter((item) => item.active && item.kind !== "coat" && (item.catalogSection || "genetics") === catalogSection)
                   .map((item) => (
                     <option key={item.id}>{item.name}</option>
                   ))}
@@ -521,9 +542,10 @@ function AnimalEditor({
             </label>
             <label>
               Pelaje
-              <select name="coat" defaultValue={animal?.coat || "Negro"}>
-                <option>Negro</option>
-                <option>Colorado</option>
+              <select name="coat" key={`${catalogSection}-${animal?.coat||""}`} defaultValue={animal?.coat || ""}>
+                <option value="">Sin especificar</option>
+                {animal?.coat&&!categories.some(item=>item.kind==="coat"&&(item.catalogSection||"genetics")===catalogSection&&item.name===animal.coat)&&<option>{animal.coat}</option>}
+                {categories.filter(item=>item.active&&item.kind==="coat"&&(item.catalogSection||"genetics")===catalogSection).map(item=><option key={item.id}>{item.name}</option>)}
               </select>
             </label>
             <label>
@@ -535,7 +557,7 @@ function AnimalEditor({
               />
             </label>
             <label>
-              Peso al nacer
+              {fieldLabels.birthWeightLabel || "Dato 1"}
               <input
                 name="birthWeight"
                 defaultValue={animal?.birthWeight || ""}
@@ -543,7 +565,7 @@ function AnimalEditor({
               />
             </label>
             <label>
-              Peso al destete
+              {fieldLabels.weaningWeightLabel || "Dato 2"}
               <input
                 name="weaningWeight"
                 defaultValue={animal?.weaningWeight || ""}
@@ -551,7 +573,7 @@ function AnimalEditor({
               />
             </label>
             <label>
-              Circunferencia escrotal
+              {fieldLabels.scrotalCircumferenceLabel || "Dato 3"}
               <input
                 name="scrotalCircumference"
                 defaultValue={animal?.scrotalCircumference || ""}
@@ -559,13 +581,19 @@ function AnimalEditor({
               />
             </label>
             <label>
-              Frame
+              {fieldLabels.frameLabel || "Dato 4"}
               <input
                 name="frame"
                 defaultValue={animal?.frame || ""}
                 placeholder="5.8"
               />
             </label>
+            <div className="fullField editorSectionIntro">
+              <small>Presentación de la ficha</small>
+              <h3>Rótulos de información</h3>
+              <p>Adaptalos a ganado o caballos. Un rótulo vacío oculta ese dato en la ficha pública.</p>
+            </div>
+            {Object.entries(fieldLabels).map(([key,value])=><label key={key}>Rótulo: {labelDefaults(catalogSection)[key as keyof typeof initialLabels]}<input value={value} onChange={event=>setFieldLabels(current=>({...current,[key]:event.target.value}))}/></label>)}
             <label className="fullField">
               Descripción del animal
               <textarea
@@ -794,8 +822,8 @@ function AnimalEditor({
         {tab === "deps" && (
           <div className="editorBody geneticEditor">
             <div className="editorSectionIntro">
-              <small>Información genética</small>
-              <h3>DEPs y métricas</h3>
+              <small>{catalogSection === "criollos" ? "Información del ejemplar" : "Información genética"}</small>
+              <h3>{catalogSection === "criollos" ? "Datos adicionales" : "DEPs y métricas"}</h3>
               <p>
                 Las características son configurables por animal. Solo se
                 publican las filas completas.
@@ -1200,11 +1228,12 @@ function PageContent({siteImages,content,updateSiteImage,updateContent}:{siteIma
 }
 
 function AdminCategories({categories,update}:{categories:CategoryRecord[];update:(categories:CategoryRecord[])=>void}){
-  const [name,setName]=useState("");const [error,setError]=useState("");
-  const add=async()=>{setError("");const response=await fetch("/api/categories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name})});const data=await response.json() as {category?:CategoryRecord;error?:string};if(!response.ok||!data.category){setError(data.error||"No se pudo crear la categoría.");return}update([...categories,data.category]);setName("")};
+  const [name,setName]=useState("");const [error,setError]=useState("");const [catalogSection,setCatalogSection]=useState<"genetics"|"criollos">("genetics");const [kind,setKind]=useState<"category"|"coat">("category");
+  const visible=categories.filter(item=>(item.catalogSection||"genetics")===catalogSection&&(item.kind||"category")===kind);
+  const add=async()=>{setError("");const response=await fetch("/api/categories",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,catalogSection,kind})});const data=await readApiJson<{category?:CategoryRecord;error?:string}>(response);if(!response.ok||!data.category){setError(data.error||"No se pudo crear la opción.");return}update([...categories,data.category]);setName("")};
   const save=async(category:CategoryRecord)=>{const response=await fetch("/api/categories",{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify(category)});const data=await response.json() as {category?:CategoryRecord};if(response.ok&&data.category)update(categories.map(item=>item.id===data.category!.id?data.category!:item))};
   const remove=async(category:CategoryRecord)=>{const response=await fetch(`/api/categories?id=${category.id}`,{method:"DELETE"});if(response.ok)update(categories.filter(item=>item.id!==category.id))};
-  return <><section className="adminPageHead"><div><p>Catálogo genético</p><h1>Categorías</h1><span>Definí las categorías que aparecen en los filtros y en las fichas de animales.</span></div></section><section className="adminPanel categoryManager"><header><div><h2>Categorías de animales</h2><p>Podés agregar, renombrar, ocultar o eliminar categorías.</p></div></header><div className="categoryAdd"><input value={name} onChange={e=>setName(e.target.value)} placeholder="Nueva categoría"/><button disabled={!name.trim()} onClick={()=>void add()}>＋ Agregar</button></div>{error&&<p className="editorError">{error}</p>}<div className="categoryRows">{categories.map(category=><div key={category.id}><input value={category.name} onChange={e=>update(categories.map(item=>item.id===category.id?{...item,name:e.target.value}:item))}/><label><input type="checkbox" checked={category.active} onChange={e=>void save({...category,active:e.target.checked})}/> Visible</label><button onClick={()=>void save(category)}>Guardar</button><button className="danger" onClick={()=>void remove(category)}>Eliminar</button></div>)}</div></section></>;
+  return <><section className="adminPageHead"><div><p>Catálogos de animales</p><h1>Categorías y pelajes</h1><span>Ganado y Criollos tienen opciones independientes.</span></div></section><section className="adminPanel categoryManager"><header><div><h2>{kind==="category"?"Categorías":"Pelajes"} de {catalogSection==="genetics"?"ganado":"Criollos"}</h2><p>Estas opciones aparecen únicamente en el catálogo seleccionado.</p></div></header><div className="categoryScope"><button className={catalogSection==="genetics"?"active":""} onClick={()=>setCatalogSection("genetics")}>Ganado</button><button className={catalogSection==="criollos"?"active":""} onClick={()=>setCatalogSection("criollos")}>Criollos</button><button className={kind==="category"?"active":""} onClick={()=>setKind("category")}>Categorías</button><button className={kind==="coat"?"active":""} onClick={()=>setKind("coat")}>Pelajes</button></div><div className="categoryAdd"><input value={name} onChange={e=>setName(e.target.value)} placeholder={kind==="coat"?"Nuevo pelaje":"Nueva categoría"}/><button disabled={!name.trim()} onClick={()=>void add()}>＋ Agregar</button></div>{error&&<p className="editorError">{error}</p>}<div className="categoryRows">{visible.map(category=><div key={category.id}><input value={category.name} onChange={e=>update(categories.map(item=>item.id===category.id?{...item,name:e.target.value}:item))}/><label><input type="checkbox" checked={category.active} onChange={e=>void save({...category,active:e.target.checked})}/> Visible</label><button onClick={()=>void save(category)}>Guardar</button><button className="danger" onClick={()=>void remove(category)}>Eliminar</button></div>)}</div>{!visible.length&&<div className="mediaEmpty">Todavía no hay {kind==="coat"?"pelajes":"categorías"} para este catálogo.</div>}</section></>;
 }
 
 function MediaLibrary({content,updateContent}:{content:SiteContentMap;updateContent:(values:SiteContentMap)=>void}){

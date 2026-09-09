@@ -1242,6 +1242,28 @@
   border-bottom: 1px solid #e7eae7;
 }
 
+.categoryScope {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 18px 22px 0;
+}
+
+.categoryScope button {
+  border: 1px solid #d3dad4;
+  border-radius: 999px;
+  background: #fff;
+  color: #516158;
+  padding: 9px 14px;
+  font-size: 9px;
+}
+
+.categoryScope button.active {
+  border-color: #173126;
+  background: #173126;
+  color: #fff;
+}
+
 .categoryAdd input {
   flex: 1;
 }

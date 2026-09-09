@@ -68,6 +68,14 @@ function clean(payload: Record<string, unknown>) {
     weaningWeight: value("weaningWeight") || null,
     scrotalCircumference: value("scrotalCircumference") || null,
     frame: value("frame") || null,
+    rpLabel: editorial("rpLabel", "RP"),
+    birthDateLabel: editorial("birthDateLabel", "Nacimiento"),
+    coatLabel: editorial("coatLabel", "Pelaje"),
+    registrationLabel: editorial("registrationLabel", "Registro"),
+    birthWeightLabel: editorial("birthWeightLabel", payload.catalogSection === "criollos" ? "Sexo" : "Peso al nacer"),
+    weaningWeightLabel: editorial("weaningWeightLabel", payload.catalogSection === "criollos" ? "Categoría" : "Peso al destete"),
+    scrotalCircumferenceLabel: editorial("scrotalCircumferenceLabel", payload.catalogSection === "criollos" ? "Marcha" : "Circ. escrotal"),
+    frameLabel: editorial("frameLabel", payload.catalogSection === "criollos" ? "Estado" : "Frame"),
     updatedAt: new Date().toISOString(),
   };
 }
