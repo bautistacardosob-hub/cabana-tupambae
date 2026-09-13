@@ -124,11 +124,11 @@ footer{background:#211710}footer a{color:#d9ae80}footer>small{color:#96877b}
 .galleryCount2{height:640px;grid-template-columns:1.45fr 1fr;grid-template-rows:1fr}
 .galleryCount2 .galleryMain{grid-row:1}
 .galleryCount2 .galleryTop{grid-row:1}
-.animalVideoPlayer{width:100%;aspect-ratio:16/9;margin:0 0 28px;background:#160f0b;display:grid;place-items:center;overflow:hidden}
+.animalVideoPlayer{width:min(1120px,100%);aspect-ratio:16/9;margin:0 auto 40px;background:#160f0b;display:grid;place-items:center;overflow:hidden}
 .animalVideoPlayer iframe,.animalVideoPlayer video{width:100%;height:100%;border:0;object-fit:contain;background:#000}
 .animalVideoPlayer>a{display:grid;place-items:center;gap:14px;color:#fff;text-decoration:none;text-transform:uppercase;font-size:10px;letter-spacing:.14em}
 .animalVideoPlayer>a span{display:grid;width:64px;height:64px;place-items:center;border:1px solid currentColor;border-radius:50%}
-@media(max-width:900px){.galleryCount1 .galleryImage{aspect-ratio:4/3}.galleryCount2{height:auto;grid-template-columns:1fr;grid-template-rows:repeat(2,minmax(280px,48vh))}.galleryCount2 .galleryMain,.galleryCount2 .galleryTop{grid-row:auto}.animalVideoPlayer{margin-bottom:18px}}
+@media(max-width:900px){.galleryCount1 .galleryImage{aspect-ratio:4/3}.galleryCount2{height:auto;grid-template-columns:1fr;grid-template-rows:repeat(2,minmax(280px,48vh))}.galleryCount2 .galleryMain,.galleryCount2 .galleryTop{grid-row:auto}.animalVideoPlayer{width:100%;margin-bottom:18px}}
 
 /* Optional livestock-brand watermarks. Their scale and opacity remain protected by the template. */
 .animalBrandWatermark{align-self:center;justify-self:end;width:clamp(108px,10vw,158px);opacity:.1;pointer-events:none;user-select:none}
