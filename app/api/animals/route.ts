@@ -3,6 +3,7 @@ import { getDb } from "../../../db";
 import { animalMedia, animals, geneticData, pedigreeMembers } from "../../../db/schema";
 import { mediaBucket } from "../../../lib/storage";
 import { requireApiUser } from "../../api-auth";
+import { resolveAnimalPrimaryImage } from "../../../lib/animal-image";
 
 const cabinId = 1;
 
@@ -113,15 +114,19 @@ async function addDetails(db: ReturnType<typeof getDb>, rows: Array<typeof anima
   const pedigree = await db.select().from(pedigreeMembers).orderBy(asc(pedigreeMembers.sortOrder));
   const deps = await db.select().from(geneticData).orderBy(asc(geneticData.sortOrder));
   const media = await db.select().from(animalMedia).orderBy(asc(animalMedia.sortOrder));
-  return rows.map(animal => ({
-    ...animal,
-    pedigree: pedigree.filter(row => row.animalId === animal.id),
-    deps: deps.filter(row => row.animalId === animal.id),
-    media: media.filter(row => row.animalId === animal.id).map(row => ({
+  return rows.map(animal => {
+    const animalMediaRows = media.filter(row => row.animalId === animal.id).map(row => ({
       ...row,
       url: row.storageKey ? `/api/media?key=${encodeURIComponent(row.storageKey)}` : row.externalUrl,
-    })),
-  }));
+    }));
+    return {
+      ...animal,
+      image: resolveAnimalPrimaryImage(animal.image, animalMediaRows),
+      pedigree: pedigree.filter(row => row.animalId === animal.id),
+      deps: deps.filter(row => row.animalId === animal.id),
+      media: animalMediaRows,
+    };
+  });
 }
 
 async function hasFeaturedSlot(db: ReturnType<typeof getDb>, catalogSection: "genetics" | "criollos", currentId?: number) {

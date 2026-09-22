@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type * as React from "react";
 import { readApiJson, uploadFileDirect, uploadImageDirect } from "../lib/client-upload";
 import { createBrowserSupabaseClient } from "../lib/supabase/client";
+import { readAnimalImagePresentation, writeAnimalImagePresentation, type AnimalImageFit } from "../lib/animal-image";
 import {
   Brand,
   SiteImageContext,
@@ -240,9 +241,11 @@ function AnimalEditor({
   );
   const [deps, setDeps] = useState<DepRecord[]>(animal?.deps ?? []);
   const [media, setMedia] = useState<MediaRecord[]>(animal?.media ?? []);
-  const [primaryImage, setPrimaryImage] = useState(
-    animal?.image || "/animal-black.jpg",
-  );
+  const initialImagePresentation = readAnimalImagePresentation(animal?.image);
+  const [primaryImage, setPrimaryImage] = useState(initialImagePresentation.source);
+  const [imageFit, setImageFit] = useState<AnimalImageFit>(initialImagePresentation.fit);
+  const [imagePositionX, setImagePositionX] = useState(initialImagePresentation.x);
+  const [imagePositionY, setImagePositionY] = useState(initialImagePresentation.y);
   const [videoUrl, setVideoUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [editorial, setEditorial] = useState({
@@ -382,7 +385,7 @@ function AnimalEditor({
         geneticsProviderName: String(data.get("geneticsProviderName") || ""),
         geneticsProviderUrl: String(data.get("geneticsProviderUrl") || ""),
         catalogSection,
-        image: primaryImage,
+        image: writeAnimalImagePresentation(primaryImage, imageFit, imagePositionX, imagePositionY),
         birthWeight: String(data.get("birthWeight") || ""),
         weaningWeight: String(data.get("weaningWeight") || ""),
         scrotalCircumference: String(data.get("scrotalCircumference") || ""),
@@ -460,7 +463,7 @@ function AnimalEditor({
         >
           <div
             className="editorPhoto"
-            style={{ backgroundImage: `url(${primaryImage})` }}
+            style={{ backgroundImage: `url(${primaryImage})`, backgroundSize: imageFit, backgroundPosition: `${imagePositionX}% ${imagePositionY}%`, backgroundRepeat: "no-repeat" }}
           >
             <span>Fotografía principal</span>
             <label className={uploading ? "disabled" : ""}>
@@ -478,6 +481,28 @@ function AnimalEditor({
             </label>
           </div>
           <input type="hidden" name="image" value={primaryImage} />
+          <div className="imageFrameControls">
+            <div>
+              <b>Encuadre de la foto</b>
+              <small>Elegí “Imagen completa” para evitar que se corte el animal.</small>
+            </div>
+            <label>
+              Ajuste
+              <select value={imageFit} onChange={event=>setImageFit(event.target.value as AnimalImageFit)}>
+                <option value="cover">Llenar el espacio</option>
+                <option value="contain">Imagen completa</option>
+              </select>
+            </label>
+            <label>
+              Posición horizontal
+              <input type="range" min="0" max="100" value={imagePositionX} onChange={event=>setImagePositionX(Number(event.target.value))}/>
+            </label>
+            <label>
+              Posición vertical
+              <input type="range" min="0" max="100" value={imagePositionY} onChange={event=>setImagePositionY(Number(event.target.value))}/>
+            </label>
+            <button type="button" onClick={()=>{setImageFit("contain");setImagePositionX(50);setImagePositionY(50)}}>Centrar y mostrar completa</button>
+          </div>
           <div className="fieldGrid">
             <label className="fullField">
               Catálogo de venta

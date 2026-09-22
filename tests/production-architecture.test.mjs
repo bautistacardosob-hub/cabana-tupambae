@@ -74,6 +74,22 @@ test("supports curated home animals and uploaded PDF documents", async () => {
   assert.match(storageMigration, /25165824/);
 });
 
+test("recovers missing animal covers and offers per-animal image framing", async () => {
+  const [page, editor, animalsApi, helper, styles] = await Promise.all([
+    readRaw("app/page.tsx"),
+    readRaw("app/admin-panel.tsx"),
+    readRaw("app/api/animals/route.ts"),
+    readRaw("lib/animal-image.ts"),
+    readRaw("app/globals.css"),
+  ]);
+  assert.match(animalsApi, /resolveAnimalPrimaryImage/);
+  assert.match(helper, /images\[0\]\?\.url \|\| fallbackImage/);
+  assert.match(editor, /Centrar y mostrar completa/);
+  assert.match(editor, /writeAnimalImagePresentation/);
+  assert.match(page, /animalImageStyle\(a,1100\)/);
+  assert.match(styles, /\.animalImage-contain/);
+});
+
 test("removes animal media from storage when deleting an animal", async () => {
   const animalsApi = await read("app/api/animals/route.ts");
   assert.match(animalsApi, /mediaBucket\(\)\.delete\(storageKey\)/);
