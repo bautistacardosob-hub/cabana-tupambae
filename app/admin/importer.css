@@ -1,0 +1,35 @@
+.adminShell .adminPageActions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.adminShell .adminPageActions button{min-height:42px;padding:0 16px;border:1px solid #183427;border-radius:7px;background:#183427;color:#fff;font-size:11px;font-weight:700;white-space:nowrap}
+.adminShell .adminPageActions .secondaryAction{border-color:#cfd7d1;background:#fff;color:#234032}
+.adminShell .animalImportPanel{margin-bottom:22px;overflow:hidden}
+.adminShell .animalImportPanel>header{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:22px 24px;border-bottom:1px solid #e4e7e4}
+.adminShell .animalImportPanel>header small{color:#8a5133;font-size:10px;font-weight:800;letter-spacing:.14em;text-transform:uppercase}
+.adminShell .animalImportPanel>header h2{margin:5px 0 4px;font:30px/1.05 var(--display);font-weight:400}
+.adminShell .animalImportPanel>header p{margin:0;color:#68726c;font-size:12px}
+.adminShell .animalImportPanel>header>button{width:34px;height:34px;padding:0;border:0;border-radius:50%;background:#f5efe8;color:#7d4b36;font-size:20px}
+.adminShell .animalImportSettings{display:grid;grid-template-columns:minmax(270px,2fr) repeat(3,minmax(155px,1fr));gap:16px;align-items:end;padding:22px 24px}
+.adminShell .animalImportSettings>label:first-child{grid-column:span 2}
+.adminShell .animalImportSettings label{display:grid;gap:7px;color:#536159;font-size:10px;font-weight:800;letter-spacing:.03em}
+.adminShell .animalImportSettings input,.adminShell .animalImportSettings select{display:block;width:100%;min-width:0;min-height:43px;padding:9px 11px;border:1px solid #d6dcd7;border-radius:7px;background:#fff;color:#17261e;font-size:12px}
+.adminShell .animalImportSettings input[type=file]{padding:6px}
+.adminShell .animalImportSettings input[type=file]::file-selector-button{height:31px;margin-right:10px;padding:0 12px;border:0;border-radius:5px;background:#e9f0eb;color:#234032;font-size:11px;font-weight:700;cursor:pointer}
+.adminShell .animalImportSettings>button{grid-column:4;justify-self:end;min-height:43px;padding:0 18px;border:1px solid #6c422b;border-radius:7px;background:#6c422b;color:#fff;font-size:11px;font-weight:800}
+.adminShell .animalImportSettings>button:disabled,.adminShell .animalImportPanel>footer button:disabled{cursor:not-allowed;opacity:.5}
+.adminShell .animalImportSummary{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #e4e7e4;border-bottom:1px solid #e4e7e4}
+.adminShell .animalImportSummary span{padding:14px 20px;color:#68726c;font-size:11px}
+.adminShell .animalImportSummary span+span{border-left:1px solid #e4e7e4}
+.adminShell .animalImportSummary b{display:block;color:#17261e;font:26px/1 var(--display);font-weight:400}
+.adminShell .animalImportTable{padding:0 24px;overflow-x:auto}
+.adminShell .animalImportTable>div{display:grid;grid-template-columns:50px minmax(190px,1.6fr) minmax(120px,1fr) minmax(120px,1fr) minmax(110px,.8fr);gap:14px;align-items:center;min-width:760px;padding:12px 0;border-bottom:1px solid #edf0ed}
+.adminShell .animalImportTable>div:first-child{color:#8a938e;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+.adminShell .animalImportTable span{display:grid;gap:3px;color:#46534c;font-size:11px}
+.adminShell .animalImportTable span>b{color:#17261e}
+.adminShell .animalImportTable small{color:#8a938e}
+.adminShell .animalImportTable .importReady{color:#267244}.adminShell .animalImportTable .importExisting{color:#8a6233}.adminShell .animalImportTable .importError{color:#a23e32}
+.adminShell .animalImportMore{margin:12px 24px 0;color:#7a847e;font-size:10px}
+.adminShell .animalImportPanel>footer{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 24px}
+.adminShell .animalImportPanel>footer span{color:#68726c;font-size:10px}
+.adminShell .animalImportPanel>footer button{min-height:43px;padding:0 16px;border:1px solid #6c422b;border-radius:7px;background:#6c422b;color:#fff;font-size:11px;font-weight:800}
+.adminShell .animalImportPanel>.editorError,.adminShell .animalImportPanel>.accountSuccess{margin:0 24px 20px}
+@media(max-width:1200px){.adminShell .animalImportSettings{grid-template-columns:repeat(2,minmax(0,1fr))}.adminShell .animalImportSettings>label:first-child{grid-column:span 2}.adminShell .animalImportSettings>button{grid-column:2}}
+@media(max-width:760px){.adminShell .adminPageActions{width:100%;justify-content:stretch}.adminShell .adminPageActions button{flex:1}.adminShell .animalImportPanel>header{padding:18px}.adminShell .animalImportSettings{grid-template-columns:1fr;padding:18px}.adminShell .animalImportSettings>label:first-child,.adminShell .animalImportSettings>button{grid-column:auto}.adminShell .animalImportSettings>button{width:100%}.adminShell .animalImportSummary{grid-template-columns:repeat(2,1fr)}.adminShell .animalImportSummary span:nth-child(3){border-left:0;border-top:1px solid #e4e7e4}.adminShell .animalImportSummary span:nth-child(4){border-top:1px solid #e4e7e4}.adminShell .animalImportPanel>footer{align-items:flex-start;flex-direction:column;padding:16px 18px}.adminShell .animalImportPanel>footer button{width:100%}}

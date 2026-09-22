@@ -1533,3 +1533,41 @@
 .newsCardActions{display:flex;align-items:flex-end;justify-content:space-between;gap:14px}.newsOrderControls{display:flex;gap:6px}.newsAdminGrid article .newsOrderControls button{width:34px;height:34px;padding:0;border:1px solid #d7cec4;border-radius:50%;background:#f7f2eb;color:#6c422b;font-size:15px}.newsAdminGrid article .newsOrderControls button:disabled{cursor:not-allowed;opacity:.35}.newsOrderError{margin:0 0 16px}
 @media(max-width:1200px){.newsAdminGrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:760px){.newsAdminGrid{grid-template-columns:1fr}}
+
+/* Excel catalog importer: keep these rules in the admin bundle. */
+.adminPageActions{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.adminPageActions button{min-height:42px;padding:0 16px;border:1px solid #183427;border-radius:7px;background:#183427;color:#fff;font-size:11px;font-weight:700;white-space:nowrap;transition:transform .18s ease,box-shadow .18s ease}
+.adminPageActions .secondaryAction{border-color:#cfd7d1;background:#fff;color:#234032}
+.adminPageActions button:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(24,52,39,.1)}
+.animalImportPanel{margin-bottom:22px;overflow:hidden}
+.animalImportPanel>header{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;padding:22px 24px;border-bottom:1px solid #e4e7e4}
+.animalImportPanel>header p,.animalImportPanel>header h2,.animalImportPanel>header span{margin:0}
+.animalImportPanel>header p{margin-bottom:4px;color:#8b6a56;font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.animalImportPanel>header h2{font-size:20px}
+.animalImportPanel>header span{display:block;margin-top:7px;color:#66716c;font-size:12px}
+.animalImportPanel>header button{width:34px;height:34px;padding:0;border:0;border-radius:50%;background:#f5efe8;color:#7d4b36;font-size:18px}
+.animalImportSettings{display:grid;grid-template-columns:minmax(260px,1.4fr) repeat(2,minmax(180px,1fr));gap:18px 16px;align-items:end;padding:22px 24px}
+.animalImportSettings>label:first-child{grid-column:span 2}
+.animalImportSettings label{display:grid;gap:7px;color:#5e6964;font-size:10px;font-weight:700;letter-spacing:.04em}
+.animalImportSettings input,.animalImportSettings select{width:100%;min-width:0;height:44px;padding:0 12px;border:1px solid #d7ded9;border-radius:7px;background:#fff;color:#27372f;font:inherit;font-size:12px;font-weight:500;letter-spacing:0}
+.animalImportSettings input[type=file]{height:auto;padding:6px}
+.animalImportSettings input[type=file]::file-selector-button{height:32px;margin-right:10px;padding:0 12px;border:0;border-radius:5px;background:#e9f0eb;color:#234032;font-size:11px;font-weight:700;cursor:pointer}
+.animalImportSettings>button{justify-self:start;min-height:44px;padding:0 18px;border:1px solid #183427;border-radius:7px;background:#183427;color:#fff;font-size:11px;font-weight:700}
+.animalImportSettings>button:disabled{cursor:not-allowed;opacity:.5}
+.animalImportError{margin:0 24px 20px;padding:11px 13px;border-radius:6px;background:#fff0ed;color:#9e3b2f;font-size:12px}
+.animalImportPreview{border-top:1px solid #e4e7e4}
+.animalImportSummary{display:flex;gap:22px;align-items:center;padding:16px 24px;background:#f8faf8;color:#56625c;font-size:12px}
+.animalImportSummary b{color:#183427}
+.animalImportTableWrap{overflow-x:auto}
+.animalImportTable{width:100%;border-collapse:collapse;font-size:12px}
+.animalImportTable th,.animalImportTable td{padding:12px 14px;border-top:1px solid #e8ebe9;text-align:left;vertical-align:top;white-space:nowrap}
+.animalImportTable th{color:#7b8580;font-size:9px;letter-spacing:.1em;text-transform:uppercase}
+.animalImportTable td:last-child{white-space:normal}
+.animalImportTable tr.hasError{background:#fff7f5}
+.animalImportTable small{display:block;margin-top:4px;color:#a14437;line-height:1.35}
+.animalImportActions{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 24px;border-top:1px solid #e4e7e4}
+.animalImportActions span{color:#65706b;font-size:11px}
+.animalImportActions button{min-height:42px;padding:0 18px;border:1px solid #183427;border-radius:7px;background:#183427;color:#fff;font-size:11px;font-weight:700}
+.animalImportActions button:disabled{cursor:not-allowed;opacity:.5}
+@media(max-width:1200px){.animalImportSettings{grid-template-columns:repeat(2,minmax(0,1fr))}.animalImportSettings>label:first-child{grid-column:span 2}}
+@media(max-width:760px){.adminPageActions{width:100%;justify-content:stretch}.adminPageActions button{flex:1}.animalImportPanel>header{padding:18px}.animalImportSettings{grid-template-columns:1fr;padding:18px}.animalImportSettings>label:first-child{grid-column:span 1}.animalImportSettings>button{width:100%}.animalImportSummary,.animalImportActions{align-items:flex-start;flex-direction:column;padding:16px 18px}.animalImportActions button{width:100%}}
