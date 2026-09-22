@@ -90,6 +90,26 @@ test("recovers missing animal covers and offers per-animal image framing", async
   assert.match(styles, /\.animalImage-contain/);
 });
 
+test("keeps a separate home crop and offers PDF and comparison tools", async () => {
+  const { readAnimalImagePresentation, writeAnimalImagePresentation } = await import("../lib/animal-image.ts");
+  const saved = writeAnimalImagePresentation("/api/media?key=animals/test.jpg", "cover", 35, 58, "contain", 50, 50);
+  assert.deepEqual(readAnimalImagePresentation(saved), {
+    source: "/api/media?key=animals%2Ftest.jpg", fit: "cover", x: 35, y: 58,
+    homeFit: "contain", homeX: 50, homeY: 50,
+  });
+  const [editor, page, detail, comparison, pdf] = await Promise.all([
+    readRaw("app/admin-panel.tsx"), readRaw("app/page.tsx"),
+    readRaw("app/animal-detail-actions.tsx"), readRaw("app/animal-compare.tsx"),
+    readRaw("app/api/animals/[id]/pdf/route.ts"),
+  ]);
+  assert.match(editor, /Encuadre en Inicio/);
+  assert.match(page, /image\.homeFit/);
+  assert.match(detail, /Descargar ficha PDF/);
+  assert.match(comparison, /Comparar seleccionados/);
+  assert.match(pdf, /QRCode\.toDataURL/);
+  assert.match(pdf, /eq\(animals\.status, "published"\)/);
+});
+
 test("imports complete animal catalogs from Excel with preview and duplicate handling", async () => {
   const [editor, route, parser, packageJson] = await Promise.all([
     readRaw("app/admin-panel.tsx"),

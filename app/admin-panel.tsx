@@ -281,6 +281,9 @@ function AnimalEditor({
   const [imageFit, setImageFit] = useState<AnimalImageFit>(initialImagePresentation.fit);
   const [imagePositionX, setImagePositionX] = useState(initialImagePresentation.x);
   const [imagePositionY, setImagePositionY] = useState(initialImagePresentation.y);
+  const [homeImageFit, setHomeImageFit] = useState<AnimalImageFit>(initialImagePresentation.homeFit);
+  const [homeImageX, setHomeImageX] = useState(initialImagePresentation.homeX);
+  const [homeImageY, setHomeImageY] = useState(initialImagePresentation.homeY);
   const [videoUrl, setVideoUrl] = useState("");
   const [uploading, setUploading] = useState(false);
   const [editorial, setEditorial] = useState({
@@ -420,7 +423,7 @@ function AnimalEditor({
         geneticsProviderName: String(data.get("geneticsProviderName") || ""),
         geneticsProviderUrl: String(data.get("geneticsProviderUrl") || ""),
         catalogSection,
-        image: writeAnimalImagePresentation(primaryImage, imageFit, imagePositionX, imagePositionY),
+        image: writeAnimalImagePresentation(primaryImage, imageFit, imagePositionX, imagePositionY, homeImageFit, homeImageX, homeImageY),
         birthWeight: String(data.get("birthWeight") || ""),
         weaningWeight: String(data.get("weaningWeight") || ""),
         scrotalCircumference: String(data.get("scrotalCircumference") || ""),
@@ -537,6 +540,17 @@ function AnimalEditor({
               <input type="range" min="0" max="100" value={imagePositionY} onChange={event=>setImagePositionY(Number(event.target.value))}/>
             </label>
             <button type="button" onClick={()=>{setImageFit("contain");setImagePositionX(50);setImagePositionY(50)}}>Centrar y mostrar completa</button>
+          </div>
+          <div className="imageFrameControls homeFrameControls">
+            <div>
+              <b>Encuadre en Inicio</b>
+              <small>Previsualizá la tarjeta destacada. Este ajuste no cambia la portada de la ficha ni la del catálogo.</small>
+            </div>
+            <div className="homeFramePreview" style={{backgroundImage:`url(${primaryImage})`,backgroundSize:homeImageFit,backgroundPosition:`${homeImageX}% ${homeImageY}%`,backgroundRepeat:"no-repeat"}} role="img" aria-label="Vista previa de la foto en Inicio"/>
+            <label>Ajuste<select value={homeImageFit} onChange={event=>setHomeImageFit(event.target.value as AnimalImageFit)}><option value="cover">Llenar la tarjeta</option><option value="contain">Mostrar animal completo</option></select></label>
+            <label>Posición horizontal<input type="range" min="0" max="100" value={homeImageX} onChange={event=>setHomeImageX(Number(event.target.value))}/></label>
+            <label>Posición vertical<input type="range" min="0" max="100" value={homeImageY} onChange={event=>setHomeImageY(Number(event.target.value))}/></label>
+            <button type="button" onClick={()=>{setHomeImageFit("contain");setHomeImageX(50);setHomeImageY(50)}}>Centrar y mostrar completo</button>
           </div>
           <div className="fieldGrid">
             <label className="fullField">

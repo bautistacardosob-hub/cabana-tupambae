@@ -4,6 +4,7 @@ import { getDb } from "../../../db";
 import { animals } from "../../../db/schema";
 import { SiteApplication } from "../../page";
 import { getPublicIdentity } from "../../../lib/site-identity";
+import { AnimalDetailActions } from "../../animal-detail-actions";
 
 type PageProps={params:Promise<{animal:string}>};
 const animalIdFrom=(value:string)=>Number(value.match(/^\d+/)?.[0]||0);
@@ -27,5 +28,6 @@ export async function generateMetadata({params}:PageProps):Promise<Metadata>{
 
 export default async function AnimalPage({params}:PageProps){
   const {animal:value}=await params;
-  return <SiteApplication initialScreen="animal" initialAnimalId={animalIdFrom(value)}/>;
+  const animal=await getAnimal(value);
+  return <><SiteApplication initialScreen="animal" initialAnimalId={animalIdFrom(value)}/>{animal&&<AnimalDetailActions id={animal.id} section="genetics"/>}</>;
 }
