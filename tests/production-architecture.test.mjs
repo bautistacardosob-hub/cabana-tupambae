@@ -90,6 +90,21 @@ test("recovers missing animal covers and offers per-animal image framing", async
   assert.match(styles, /\.animalImage-contain/);
 });
 
+test("imports complete animal catalogs from Excel with preview and duplicate handling", async () => {
+  const [editor, route, parser, packageJson] = await Promise.all([
+    readRaw("app/admin-panel.tsx"),
+    readRaw("app/api/animals/import/route.ts"),
+    readRaw("lib/animal-import.ts"),
+    readRaw("package.json"),
+  ]);
+  assert.match(editor, /Importar catálogo desde Excel/);
+  assert.match(editor, /Revisar archivo/);
+  assert.match(route, /requireApiUser/);
+  assert.match(route, /mode === "skip"/);
+  assert.match(parser, /"PN", "PD", "HL", "P18", "PA", "CE", "AOB", "Grasa", "MAR"/);
+  assert.match(packageJson, /read-excel-file/);
+});
+
 test("removes animal media from storage when deleting an animal", async () => {
   const animalsApi = await read("app/api/animals/route.ts");
   assert.match(animalsApi, /mediaBucket\(\)\.delete\(storageKey\)/);
