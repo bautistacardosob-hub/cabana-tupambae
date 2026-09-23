@@ -122,6 +122,18 @@ test("allows a separate transparent brand mark for animal PDFs", async () => {
   assert.doesNotMatch(renderer, /page\.drawRectangle\(\{ x: 35, y: 760, width: 187, height: 72/);
 });
 
+test("can reset the optional PDF mark and select Top percentiles", async () => {
+  const [editor, images, publication] = await Promise.all([
+    readRaw("app/admin-panel.tsx"), readRaw("app/api/site-images/route.ts"), readRaw("app/api/publication/route.ts"),
+  ]);
+  assert.match(editor, /Usar Marca de la estancia/);
+  assert.match(editor, /<option value="Top 5%">Top 5%<\/option>/);
+  assert.match(editor, /<option value="Top 20%">Top 20%<\/option>/);
+  assert.match(images, /action==="reset-image"/);
+  assert.match(images, /draftStorageKey:""/);
+  assert.match(publication, /imageKey==="brand-pdf"\?"":fallback/);
+});
+
 test("imports complete animal catalogs from Excel with preview and duplicate handling", async () => {
   const [editor, route, parser, packageJson] = await Promise.all([
     readRaw("app/admin-panel.tsx"),

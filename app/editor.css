@@ -1357,6 +1357,20 @@
   cursor: wait;
 }
 
+.siteImageGrid .resetPdfBrand {
+  display: inline-block;
+  margin-left: 10px;
+  padding: 10px 12px;
+  border: 1px solid #d3d9d4;
+  border-radius: 6px;
+  background: #fff;
+  color: #6d453a;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+}
+.siteImageGrid .resetPdfBrand:disabled { opacity: .55; cursor: wait; }
+
 .siteImageGrid label input,
 .auctionImageUpload input,
 .editorPhoto > label input {

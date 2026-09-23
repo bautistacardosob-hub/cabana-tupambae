@@ -26,8 +26,8 @@ type ImagePayload = {
 };
 
 function publicRow(row: typeof siteImages.$inferSelect,draft=false) {
-  const key=draft?(row.draftStorageKey||row.storageKey):row.storageKey;
-  return { ...row, url: key ? `/api/media?key=${encodeURIComponent(key)}` : row.fallbackUrl };
+  const key=draft&&row.draftStorageKey!==null?row.draftStorageKey:row.storageKey;
+  return { ...row, url: key ? `/api/media?key=${encodeURIComponent(key)}` : row.imageKey==="brand-pdf" ? "" : row.fallbackUrl };
 }
 
 async function saveDraftImage(imageKey:string,label:string,fallbackUrl:string,storageKey:string,contentType:string){
@@ -47,7 +47,7 @@ export async function GET(request:Request) {
     if(draft){const unauthorized=await requireApiUser();if(unauthorized)return unauthorized}
     const rows = await getDb().select().from(siteImages).where(eq(siteImages.cabinId, cabinId));
     return Response.json(
-      { images: rows.map(row=>publicRow(row,draft)), hasDraft:rows.some(row=>Boolean(row.draftStorageKey)) },
+      { images: rows.map(row=>publicRow(row,draft)), hasDraft:rows.some(row=>row.draftStorageKey!==null) },
       {headers:{"Cache-Control":draft?"private, no-store":"public, s-maxage=15, stale-while-revalidate=120"}}
     );
   } catch (error) {
@@ -62,6 +62,15 @@ export async function POST(request: Request) {
     const requestType=request.headers.get("content-type")||"";
     if(requestType.includes("application/json")){
       const body=await request.json() as ImagePayload;
+      if(body.action==="reset-image"){
+        if(body.imageKey!=="brand-pdf")return Response.json({error:"Solo se puede quitar la marca opcional de las fichas PDF."},{status:400});
+        const db=getDb();
+        const [current]=await db.select().from(siteImages).where(and(eq(siteImages.cabinId,cabinId),eq(siteImages.imageKey,"brand-pdf"))).limit(1);
+        if(!current)return Response.json({error:"Todavía no hay una marca de fichas PDF para quitar."},{status:404});
+        const [row]=await db.update(siteImages).set({draftStorageKey:"",draftContentType:null,updatedAt:new Date().toISOString()}).where(eq(siteImages.id,current.id)).returning();
+        if(current.draftStorageKey&&current.draftStorageKey!==current.storageKey)await bucket().delete(current.draftStorageKey).catch(()=>undefined);
+        return Response.json({image:publicRow(row,true),hasDraft:true});
+      }
       const imageKey=String(body.imageKey||"").trim();
       const label=String(body.label||imageKey).trim();
       const fallbackUrl=String(body.fallbackUrl||"/hero-cattle.jpg").trim();

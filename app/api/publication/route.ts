@@ -6,7 +6,7 @@ import { requireApiUser } from "../../api-auth";
 const cabinId=1;
 type Snapshot={content:Record<string,string>;images:Record<string,{storageKey:string|null;fallbackUrl:string;contentType:string|null}>};
 
-const imageUrl=(key:string|null,fallback:string)=>key?`/api/media?key=${encodeURIComponent(key)}`:fallback;
+const imageUrl=(imageKey:string,key:string|null,fallback:string)=>key?`/api/media?key=${encodeURIComponent(key)}`:imageKey==="brand-pdf"?"":fallback;
 
 async function currentSnapshot():Promise<Snapshot>{
   const db=getDb();
@@ -33,7 +33,7 @@ export async function POST(){
       const [publication]=await tx.insert(sitePublications).values({cabinId,snapshot:JSON.stringify(snapshot),publishedAt:updatedAt}).returning();
       return {publication,snapshot};
     });
-    return Response.json({publication:{id:publication.id,publishedAt:publication.publishedAt},content:snapshot.content,images:Object.entries(snapshot.images).map(([imageKey,image])=>({imageKey,url:imageUrl(image.storageKey,image.fallbackUrl)}))});
+    return Response.json({publication:{id:publication.id,publishedAt:publication.publishedAt},content:snapshot.content,images:Object.entries(snapshot.images).map(([imageKey,image])=>({imageKey,url:imageUrl(imageKey,image.storageKey,image.fallbackUrl)}))});
   }catch(error){return Response.json({error:error instanceof Error?error.message:"No se pudieron publicar los cambios."},{status:500})}
 }
 
@@ -47,6 +47,6 @@ export async function PATCH(request:Request){
     for(const [contentKey,value] of Object.entries(snapshot.content)){const [row]=await db.select().from(siteContent).where(and(eq(siteContent.cabinId,cabinId),eq(siteContent.contentKey,contentKey)));if(row)await db.update(siteContent).set({value,draftValue:null,updatedAt:new Date().toISOString()}).where(eq(siteContent.id,row.id));else await db.insert(siteContent).values({cabinId,contentKey,value,draftValue:null,updatedAt:new Date().toISOString()})}
     for(const [imageKey,image] of Object.entries(snapshot.images)){const [row]=await db.select().from(siteImages).where(and(eq(siteImages.cabinId,cabinId),eq(siteImages.imageKey,imageKey)));if(row)await db.update(siteImages).set({storageKey:image.storageKey,contentType:image.contentType,fallbackUrl:image.fallbackUrl,draftStorageKey:null,draftContentType:null,updatedAt:new Date().toISOString()}).where(eq(siteImages.id,row.id))}
     const restored=await currentSnapshot();
-    return Response.json({content:restored.content,images:Object.entries(restored.images).map(([imageKey,image])=>({imageKey,url:imageUrl(image.storageKey,image.fallbackUrl)}))});
+    return Response.json({content:restored.content,images:Object.entries(restored.images).map(([imageKey,image])=>({imageKey,url:imageUrl(imageKey,image.storageKey,image.fallbackUrl)}))});
   }catch(error){return Response.json({error:error instanceof Error?error.message:"No se pudo restaurar la versión."},{status:500})}
 }
