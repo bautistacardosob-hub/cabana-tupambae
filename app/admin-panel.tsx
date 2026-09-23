@@ -954,7 +954,7 @@ function AnimalEditor({
                   />
                   <input
                     value={dep.percentile || ""}
-                    placeholder="15%"
+                    placeholder="Top 5%"
                     onChange={(e) =>
                       setDeps((current) =>
                         current.map((item, i) =>

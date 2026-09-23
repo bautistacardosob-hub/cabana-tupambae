@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { AnimalRecord } from "./page";
 import { readAnimalImagePresentation } from "../lib/animal-image";
+import { hasAnimalValue } from "../lib/animal-display";
 import { optimizedImageUrl } from "../lib/image-url";
 import "./animal-catalog.css";
 
@@ -25,14 +26,14 @@ function imageStyle(animal: AnimalRecord) {
 
 function cardFacts(animal: AnimalRecord, horse: boolean) {
   const priorities = ["PD", "P18", "AOB"];
-  const genetic = horse ? [] : (animal.deps || []).filter(item => item.label && item.value).toSorted((a, b) => {
+  const genetic = horse ? [] : (animal.deps || []).filter(item => hasAnimalValue(item.label) && hasAnimalValue(item.value)).toSorted((a, b) => {
     const rank = (label: string) => { const index = priorities.findIndex(key => new RegExp(`\\b${key}\\b`, "i").test(label)); return index < 0 ? priorities.length : index; };
     return rank(a.label) - rank(b.label);
   }).map(item => [`DEP ${item.label}`, item.value]);
   const ordinary = horse
     ? [[animal.coatLabel || "Pelaje", animal.coat], [animal.birthDateLabel || "Nacimiento", animal.birthDate], [animal.registrationLabel || "Registro", animal.registration]]
     : [[animal.weaningWeightLabel || "Peso al destete", animal.weaningWeight], [animal.birthWeightLabel || "Peso al nacer", animal.birthWeight], [animal.scrotalCircumferenceLabel || "Circ. escrotal", animal.scrotalCircumference]];
-  return [...genetic, ...ordinary].filter((item): item is [string, string] => Boolean(item[0] && item[1])).slice(0, 3);
+  return [...genetic, ...ordinary].filter((item): item is [string, string] => hasAnimalValue(item[0]) && hasAnimalValue(item[1])).slice(0, 3);
 }
 
 export function AnimalCatalog({ animals, comparePool = animals, section, onOpen, indexOffset = 0 }: CatalogProps) {
@@ -46,7 +47,7 @@ export function AnimalCatalog({ animals, comparePool = animals, section, onOpen,
     return labelKey ? chosen.find(animal => animal[labelKey])?.[labelKey] || fallback : fallback;
   };
   const activeIds = chosen.map(animal => animal.id);
-  const depLabels = [...new Set(chosen.flatMap(animal => (animal.deps || []).map(dep => dep.label)))];
+  const depLabels = [...new Set(chosen.flatMap(animal => (animal.deps || []).filter(dep => hasAnimalValue(dep.label) && hasAnimalValue(dep.value)).map(dep => dep.label)))];
   const toggle = (id: number) => setSelected(current => {
     const present = current.filter(value => comparePool.some(animal => animal.id === value));
     return present.includes(id) ? present.filter(value => value !== id) : present.length < 3 ? [...present, id] : present;
@@ -73,7 +74,7 @@ export function AnimalCatalog({ animals, comparePool = animals, section, onOpen,
             {animal.media?.some(item => item.kind === "video") && <span className="catalogVideoBadge">Video</span>}
           </div>
           <div className="catalogAnimalBody">
-            <div className="catalogAnimalMeta"><span>{animal.breed || animal.type}</span><span>RP {animal.rp}</span></div>
+            <div className="catalogAnimalMeta"><span>{animal.breed || animal.type}</span>{hasAnimalValue(animal.rp) && <span>RP {animal.rp}</span>}</div>
             <h2>{animal.name}</h2>
             <p className="catalogAnimalType">{animal.type}</p>
             {sire && <p className="catalogAnimalSire"><small>Padre</small>{sire}</p>}
@@ -90,7 +91,7 @@ export function AnimalCatalog({ animals, comparePool = animals, section, onOpen,
       <div className="catalogCompareDialog" role="dialog" aria-modal="true" aria-labelledby="catalog-compare-title">
         <header><div><span>COMPARACIÓN</span><h2 id="catalog-compare-title">Animales lado a lado</h2></div><button type="button" onClick={() => setDialogOpen(false)} aria-label="Cerrar comparación">×</button></header>
         <div className="catalogCompareTableWrap"><table><thead><tr><th scope="col">Dato</th>{chosen.map(animal => <th scope="col" key={animal.id}><div className="catalogComparePhoto" style={imageStyle(animal)} /><strong>{animal.name}</strong><small>RP {animal.rp} · {animal.sold ? "Vendido" : "Disponible"}</small><button type="button" onClick={() => onOpen(animal)}>Ver ficha ↗</button></th>)}</tr></thead><tbody>
-          {([ ["Tipo", "type"], ["Raza", "breed"], ["Nacimiento", "birthDate"], ["Pelaje", "coat"], ["Registro", "registration"], [horse ? "Sexo" : "Peso al nacer", "birthWeight"], [horse ? "Categoría" : "Peso al destete", "weaningWeight"], [horse ? "Marcha" : "Circ. escrotal", "scrotalCircumference"], ["Frame", "frame"] ] as const).filter(([, key]) => chosen.some(animal => animal[key])).map(([label, key]) => <tr key={key}><th scope="row">{comparisonLabel(key, label)}</th>{chosen.map(animal => <td key={animal.id}>{animal[key] || "—"}</td>)}</tr>)}
+          {([ ["Tipo", "type"], ["Raza", "breed"], ["Nacimiento", "birthDate"], ["Pelaje", "coat"], ["Registro", "registration"], [horse ? "Sexo" : "Peso al nacer", "birthWeight"], [horse ? "Categoría" : "Peso al destete", "weaningWeight"], [horse ? "Marcha" : "Circ. escrotal", "scrotalCircumference"], ["Frame", "frame"] ] as const).filter(([, key]) => chosen.some(animal => hasAnimalValue(animal[key]))).map(([label, key]) => <tr key={key}><th scope="row">{comparisonLabel(key, label)}</th>{chosen.map(animal => <td key={animal.id}>{hasAnimalValue(animal[key]) ? animal[key] : "—"}</td>)}</tr>)}
           {depLabels.map(label => <tr key={label}><th scope="row">{label}</th>{chosen.map(animal => <td key={animal.id}>{animal.deps?.find(dep => dep.label === label)?.value || "—"}</td>)}</tr>)}
         </tbody></table></div>
       </div>
