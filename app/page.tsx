@@ -7,6 +7,7 @@ import { readApiJson, uploadFileDirect, uploadImageDirect } from "../lib/client-
 import { optimizedImageUrl } from "../lib/image-url";
 import { readAnimalImagePresentation } from "../lib/animal-image";
 import { formatAnimalPercentile, hasAnimalValue } from "../lib/animal-display";
+import { registrationDisplayLabel } from "../lib/animal-labels";
 import { AnimalCatalog } from "./animal-catalog";
 
 export type Screen = "home" | "cabana" | "genetica" | "animal" | "criollos" | "actualidad" | "noticia" | "galeria" | "remate" | "contacto" | "pagina" | "admin";
@@ -321,10 +322,16 @@ function Genetics({ go, animals, categories, siteImages, openAnimal }: { go: (s:
 }
 
 function Pedigree({animal}:{animal:AnimalRecord}) {
-  const parents=pedigreeLabels.slice(0,2).map(([relation,label])=>({label,record:animal.pedigree?.find(member=>member.relation===relation)})).filter(item=>hasAnimalValue(item.record?.name));
-  const grandparents=pedigreeLabels.slice(2).map(([relation,label])=>({label,record:animal.pedigree?.find(member=>member.relation===relation)})).filter(item=>hasAnimalValue(item.record?.name));
-  const member=({label,record}:{label:string;record:PedigreeMember|undefined})=><div key={label}><small>{label}</small><b>{record!.name}</b>{hasAnimalValue(record?.registration)&&<span>{record?.registration}</span>}</div>;
-  return <div className={`pedigree pedigreeColumns${1+Number(parents.length>0)+Number(grandparents.length>0)}`} aria-label="Pedigree de tres generaciones"><div className="pedRoot"><small>Ejemplar</small><b>{animal.name}</b>{hasAnimalValue(animal.registration||animal.rp)&&<span>{animal.registration||`RP ${animal.rp}`}</span>}</div>{parents.length>0&&<div className="pedCol">{parents.map(member)}</div>}{grandparents.length>0&&<div className="pedCol third">{grandparents.map(member)}</div>}</div>;
+  const family=([
+    {relation:"sire",label:"Padre",grandparents:[["paternal_grandsire","Abuelo paterno"],["paternal_granddam","Abuela paterna"]]},
+    {relation:"dam",label:"Madre",grandparents:[["maternal_grandsire","Abuelo materno"],["maternal_granddam","Abuela materna"]]},
+  ] as const).map(branch=>({
+    ...branch,
+    parent:animal.pedigree?.find(member=>member.relation===branch.relation),
+    grandparents:branch.grandparents.map(([relation,label])=>({label,record:animal.pedigree?.find(member=>member.relation===relation)})).filter(item=>hasAnimalValue(item.record?.name)),
+  })).filter(branch=>hasAnimalValue(branch.parent?.name)||branch.grandparents.length>0);
+  const card=(label:string,record:PedigreeMember|undefined)=><div key={label}><small>{label}</small><b>{record?.name}</b>{hasAnimalValue(record?.registration)&&<span>{record?.registration}</span>}</div>;
+  return <div className="pedigree pedigreeTree" aria-label="Pedigree de tres generaciones"><div className="pedRoot"><small>Ejemplar</small><b>{animal.name}</b>{hasAnimalValue(animal.registration||animal.rp)&&<span>{animal.registration||`RP ${animal.rp}`}</span>}</div><div className={`pedigreeBranches ${family.length>1?"hasTwoBranches":""}`}>{family.map(branch=><div className={`pedigreeBranch ${branch.parent&&branch.grandparents.length?"hasGrandparents":""}`} key={branch.relation}>{hasAnimalValue(branch.parent?.name)&&<div className="pedigreeParent">{card(branch.label,branch.parent)}</div>}{branch.grandparents.length>0&&<div className="pedigreeGrandparents">{branch.grandparents.map(item=>card(item.label,item.record))}</div>}</div>)}</div></div>;
 }
 
 function AnimalDetail({ go, animal, siteImages, loaded=true }: { go: (s: Screen) => void; animal?: AnimalRecord; siteImages:SiteImageMap; loaded?:boolean }) {
@@ -343,8 +350,9 @@ function AnimalDetail({ go, animal, siteImages, loaded=true }: { go: (s: Screen)
   const geneticsProviderUrl=safeExternalUrl(animal.geneticsProviderUrl);
   const catalogUrl=animal.catalogSection==="criollos"?"/criollos#catalogo-criollos":"/genetica#catalogo-animales";
   const horse=animal.catalogSection==="criollos";
-  const heroFacts=[[animal.rpLabel??"RP",animal.rp],[animal.birthDateLabel??"Nacimiento",animal.birthDate],[animal.coatLabel??"Pelaje",animal.coat]].filter(([label,value])=>hasAnimalValue(label)&&hasAnimalValue(value));
-  const dataFacts=[[animal.registrationLabel??"Registro",animal.registration],[animal.birthWeightLabel??(horse?"Sexo":"Peso al nacer"),animal.birthWeight],[animal.weaningWeightLabel??(horse?"Categoría":"Peso al destete"),animal.weaningWeight],[animal.scrotalCircumferenceLabel??(horse?"Marcha":"Circ. escrotal"),animal.scrotalCircumference],[animal.frameLabel??(horse?"Estado":"Frame"),animal.frame]].filter(([label,value])=>hasAnimalValue(label)&&hasAnimalValue(value));
+  const weightFact:[string,string|null|undefined]=[animal.weaningWeightLabel??"Peso al destete",animal.weaningWeight];
+  const heroFacts=[[animal.rpLabel??"RP",animal.rp],[animal.birthDateLabel??"Nacimiento",animal.birthDate],...(!horse?[weightFact]:[]),[animal.coatLabel??"Pelaje",animal.coat]].filter(([label,value])=>hasAnimalValue(label)&&hasAnimalValue(value));
+  const dataFacts=[[registrationDisplayLabel(animal.registrationLabel),animal.registration],[animal.birthWeightLabel??(horse?"Sexo":"Peso al nacer"),animal.birthWeight],...(horse?[[animal.weaningWeightLabel??"Categoría",animal.weaningWeight]]:[]),[animal.scrotalCircumferenceLabel??(horse?"Marcha":"Circ. escrotal"),animal.scrotalCircumference],[animal.frameLabel??(horse?"Estado":"Frame"),animal.frame]].filter(([label,value])=>hasAnimalValue(label)&&hasAnimalValue(value));
   const visibleDeps=(animal.deps||[]).filter(dep=>hasAnimalValue(dep.label)&&hasAnimalValue(dep.value));
   const showPrecision=visibleDeps.some(dep=>hasAnimalValue(dep.precision));
   const showPercentile=visibleDeps.some(dep=>hasAnimalValue(dep.percentile));

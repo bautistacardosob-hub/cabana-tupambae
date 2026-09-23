@@ -245,7 +245,7 @@ function AnimalEditor({
   saved: boolean;
 }) {
   const labelDefaults = (section: "genetics" | "criollos") => ({
-    rpLabel: "RP", birthDateLabel: "Nacimiento", coatLabel: "Pelaje", registrationLabel: "Registro",
+    rpLabel: "RP", birthDateLabel: "Nacimiento", coatLabel: "Pelaje", registrationLabel: "HBU",
     birthWeightLabel: section === "criollos" ? "Sexo" : "Peso al nacer",
     weaningWeightLabel: section === "criollos" ? "Categoría" : "Peso al destete",
     scrotalCircumferenceLabel: section === "criollos" ? "Marcha" : "Circ. escrotal",
@@ -260,7 +260,7 @@ function AnimalEditor({
     rpLabel: animal?.rpLabel ?? initialLabels.rpLabel,
     birthDateLabel: animal?.birthDateLabel ?? initialLabels.birthDateLabel,
     coatLabel: animal?.coatLabel ?? initialLabels.coatLabel,
-    registrationLabel: animal?.registrationLabel ?? initialLabels.registrationLabel,
+    registrationLabel: animal?.registrationLabel?.trim().toLocaleLowerCase("es") === "registro" ? "HBU" : animal?.registrationLabel ?? initialLabels.registrationLabel,
     birthWeightLabel: animal?.birthWeightLabel ?? initialLabels.birthWeightLabel,
     weaningWeightLabel: animal?.weaningWeightLabel ?? initialLabels.weaningWeightLabel,
     scrotalCircumferenceLabel: animal?.scrotalCircumferenceLabel ?? initialLabels.scrotalCircumferenceLabel,
@@ -623,7 +623,7 @@ function AnimalEditor({
               </select>
             </label>
             <label>
-              Registro
+              HBU
               <input
                 name="registration"
                 defaultValue={animal?.registration || ""}
@@ -646,6 +646,11 @@ function AnimalEditor({
                 placeholder="286 kg"
               />
             </label>
+            {catalogSection === "genetics" && <label>
+              Fecha o rótulo del pesaje
+              <input value={fieldLabels.weaningWeightLabel} onChange={event=>setFieldLabels(current=>({...current,weaningWeightLabel:event.target.value}))} placeholder="Peso al 19/8/2026" />
+              <small>Se muestra junto al RP y nacimiento. Cambialo para cada campaña o animal.</small>
+            </label>}
             <label>
               {fieldLabels.scrotalCircumferenceLabel || "Dato 3"}
               <input
@@ -667,7 +672,7 @@ function AnimalEditor({
               <h3>Rótulos de información</h3>
               <p>Adaptalos a ganado o caballos. Un rótulo vacío oculta ese dato en la ficha pública.</p>
             </div>
-            {Object.entries(fieldLabels).map(([key,value])=><label key={key}>Rótulo: {labelDefaults(catalogSection)[key as keyof typeof initialLabels]}<input value={value} onChange={event=>setFieldLabels(current=>({...current,[key]:event.target.value}))}/></label>)}
+            {Object.entries(fieldLabels).filter(([key])=>catalogSection!=="genetics"||key!=="weaningWeightLabel").map(([key,value])=><label key={key}>Rótulo: {labelDefaults(catalogSection)[key as keyof typeof initialLabels]}<input value={value} onChange={event=>setFieldLabels(current=>({...current,[key]:event.target.value}))}/></label>)}
             <label className="fullField">
               Descripción del animal
               <textarea

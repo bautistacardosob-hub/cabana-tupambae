@@ -425,7 +425,7 @@ test("separates cattle and Criollo taxonomies and supports custom animal labels"
   assert.match(categories, /body\.kind==="coat"/);
   assert.match(admin, /Categorías y pelajes/);
   assert.match(admin, /section === "criollos" \? "Marcha" : "Circ\. escrotal"/);
-  assert.match(page, /animal\.registrationLabel\?\?"Registro"/);
+  assert.match(page, /registrationDisplayLabel\(animal\.registrationLabel\)/);
   assert.match(page, /horse\?"Información adicional":"Información genética"/);
   assert.match(migration, /'Alazán', 'alazan'/);
   assert.match(migration, /idx_animal_categories_scope_slug/);

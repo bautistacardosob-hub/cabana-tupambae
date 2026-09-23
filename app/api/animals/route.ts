@@ -72,7 +72,7 @@ function clean(payload: Record<string, unknown>) {
     rpLabel: editorial("rpLabel", "RP"),
     birthDateLabel: editorial("birthDateLabel", "Nacimiento"),
     coatLabel: editorial("coatLabel", "Pelaje"),
-    registrationLabel: editorial("registrationLabel", "Registro"),
+    registrationLabel: editorial("registrationLabel", "HBU"),
     birthWeightLabel: editorial("birthWeightLabel", payload.catalogSection === "criollos" ? "Sexo" : "Peso al nacer"),
     weaningWeightLabel: editorial("weaningWeightLabel", payload.catalogSection === "criollos" ? "Categoría" : "Peso al destete"),
     scrotalCircumferenceLabel: editorial("scrotalCircumferenceLabel", payload.catalogSection === "criollos" ? "Marcha" : "Circ. escrotal"),

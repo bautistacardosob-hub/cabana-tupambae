@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { AnimalRecord } from "./page";
 import { readAnimalImagePresentation } from "../lib/animal-image";
 import { hasAnimalValue } from "../lib/animal-display";
+import { registrationDisplayLabel } from "../lib/animal-labels";
 import { optimizedImageUrl } from "../lib/image-url";
 import "./animal-catalog.css";
 
@@ -31,7 +32,7 @@ function cardFacts(animal: AnimalRecord, horse: boolean) {
     return rank(a.label) - rank(b.label);
   }).map(item => [`DEP ${item.label}`, item.value]);
   const ordinary = horse
-    ? [[animal.coatLabel || "Pelaje", animal.coat], [animal.birthDateLabel || "Nacimiento", animal.birthDate], [animal.registrationLabel || "Registro", animal.registration]]
+    ? [[animal.coatLabel || "Pelaje", animal.coat], [animal.birthDateLabel || "Nacimiento", animal.birthDate], [registrationDisplayLabel(animal.registrationLabel), animal.registration]]
     : [[animal.weaningWeightLabel || "Peso al destete", animal.weaningWeight], [animal.birthWeightLabel || "Peso al nacer", animal.birthWeight], [animal.scrotalCircumferenceLabel || "Circ. escrotal", animal.scrotalCircumference]];
   return [...genetic, ...ordinary].filter((item): item is [string, string] => hasAnimalValue(item[0]) && hasAnimalValue(item[1])).slice(0, 3);
 }

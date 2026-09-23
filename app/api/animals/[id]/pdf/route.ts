@@ -8,6 +8,7 @@ import { getDb } from "../../../../../db";
 import { animals, geneticData, pedigreeMembers, siteContent } from "../../../../../db/schema";
 import { readAnimalImagePresentation } from "../../../../../lib/animal-image";
 import { formatAnimalPercentile, hasAnimalValue } from "../../../../../lib/animal-display";
+import { registrationDisplayLabel } from "../../../../../lib/animal-labels";
 import { getPublicSiteUrl } from "../../../../../lib/site-identity";
 import { mediaBucket } from "../../../../../lib/storage";
 
@@ -121,7 +122,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const facts: Array<[string, string | null | undefined]> = [
       [animal.rpLabel || "RP", animal.rp],
       [animal.birthDateLabel || "Nacimiento", animal.birthDate],
-      [animal.registrationLabel || "Registro", animal.registration],
+      [registrationDisplayLabel(animal.registrationLabel), animal.registration],
       [animal.coatLabel || "Pelaje", animal.coat],
       [animal.birthWeightLabel || (horse ? "Sexo" : "Peso al nacer"), animal.birthWeight],
       [animal.weaningWeightLabel || (horse ? "Categoría" : "Peso al destete"), animal.weaningWeight],

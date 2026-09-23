@@ -9,6 +9,7 @@ export type ImportedAnimalDraft = {
   birthDate: string;
   registration: string;
   weaningWeight: string;
+  weaningWeightLabel: string;
   frame: string;
   pedigree: Array<{ relation: string; name: string; registration: null; sortOrder: number }>;
   deps: Array<{ label: string; value: string; precision: string | null; percentile: null; sortOrder: number }>;
@@ -74,7 +75,7 @@ export function parseAnimalWorkbook(rows: SpreadsheetCell[][], options?: { breed
 
   const indexes = {
     type: findTop("Destino", "Categoría"),
-    weight: findTop("Peso 19/8", "Peso"),
+    weight: topHeaders.findIndex(header => header === "peso" || /^peso \d{1,2} \d{1,2}(?: \d{2,4})?$/.test(header)),
     lot: findTop("Lote"),
     rp: findTop("R.P.", "RP"),
     registration: findTop("H.B.U", "HBU", "Registro"),
@@ -84,6 +85,7 @@ export function parseAnimalWorkbook(rows: SpreadsheetCell[][], options?: { breed
     maternalGrandsire: findTop("Abuelo Materno"),
     damRp: findTop("R.P Madre", "RP Madre"),
   };
+  const weightLabel = indexes.weight >= 0 ? text(top[indexes.weight]) : "Peso al destete";
 
   const parsed: ImportedAnimalDraft[] = [];
   const seen = new Set<string>();
@@ -122,6 +124,7 @@ export function parseAnimalWorkbook(rows: SpreadsheetCell[][], options?: { breed
       birthDate: excelDate(row[indexes.birthDate]),
       registration: text(row[indexes.registration]),
       weaningWeight: text(row[indexes.weight]),
+      weaningWeightLabel: weightLabel,
       frame: text(row[indexes.lot]),
       pedigree,
       deps,

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { readAnimalImagePresentation } from "../lib/animal-image";
+import { registrationDisplayLabel } from "../lib/animal-labels";
 import "./animal-tools.css";
 
 type Animal = {
@@ -35,7 +36,7 @@ export function AnimalCompare({ section }: { section: "genetics" | "criollos" })
   const baseFields: Array<[string, keyof Animal, (keyof Animal)?]> = [
     ["RP", "rp", "rpLabel"], ["Tipo", "type"], ["Raza", "breed"],
     ["Nacimiento", "birthDate", "birthDateLabel"], ["Pelaje", "coat", "coatLabel"],
-    ["Registro", "registration", "registrationLabel"], ["Peso al nacer / Sexo", "birthWeight", "birthWeightLabel"],
+    ["HBU", "registration", "registrationLabel"], ["Peso al nacer / Sexo", "birthWeight", "birthWeightLabel"],
     ["Peso al destete / Categoría", "weaningWeight", "weaningWeightLabel"],
     ["Circ. escrotal / Marcha", "scrotalCircumference", "scrotalCircumferenceLabel"], ["Frame / Estado", "frame", "frameLabel"],
   ];
@@ -56,7 +57,7 @@ export function AnimalCompare({ section }: { section: "genetics" | "criollos" })
       <div className="animalCompareDialog" role="dialog" aria-modal="true" aria-labelledby="animal-compare-title">
         <header><div><span>COMPARACIÓN</span><h2 id="animal-compare-title">Animales lado a lado</h2></div><button type="button" onClick={() => setOpen(false)} aria-label="Cerrar comparación">×</button></header>
         <div className="animalCompareTableWrap"><table><thead><tr><th scope="col">Dato</th>{chosen.map(animal => <th scope="col" key={animal.id}><div className="animalComparePhoto" style={{backgroundImage:`url(${readAnimalImagePresentation(animal.image).source})`}}/><strong>{animal.name}</strong><small>{animal.sold ? "Vendido" : "Disponible"}</small><a href={`/${route}/${animal.id}`}>Ver ficha ↗</a></th>)}</tr></thead><tbody>
-          {baseFields.map(([fallback, key, labelKey]) => chosen.some(animal => animal[key]) && <tr key={key}><th scope="row">{(labelKey && chosen.find(animal => animal[labelKey])?.[labelKey] as string) || fallback}</th>{chosen.map(animal => <td key={animal.id}>{String(animal[key] || "—")}</td>)}</tr>)}
+          {baseFields.map(([fallback, key, labelKey]) => chosen.some(animal => animal[key]) && <tr key={key}><th scope="row">{key === "registration" ? registrationDisplayLabel(chosen.find(animal => animal.registrationLabel)?.registrationLabel) : (labelKey && chosen.find(animal => animal[labelKey])?.[labelKey] as string) || fallback}</th>{chosen.map(animal => <td key={animal.id}>{String(animal[key] || "—")}</td>)}</tr>)}
           {depLabels.map(label => <tr key={label}><th scope="row">{label}</th>{chosen.map(animal => <td key={animal.id}>{animal.deps?.find(dep => dep.label === label)?.value || "—"}</td>)}</tr>)}
         </tbody></table></div>
       </div>
