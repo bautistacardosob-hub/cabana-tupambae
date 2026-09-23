@@ -8,6 +8,7 @@ import { getDb } from "../../../../../db";
 import { animals, geneticData, pedigreeMembers, siteContent } from "../../../../../db/schema";
 import { readAnimalImagePresentation } from "../../../../../lib/animal-image";
 import { formatAnimalPercentile, hasAnimalValue } from "../../../../../lib/animal-display";
+import { getPublicSiteUrl } from "../../../../../lib/site-identity";
 import { mediaBucket } from "../../../../../lib/storage";
 
 export const runtime = "nodejs";
@@ -85,8 +86,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     ]);
     const cabinName = brand[0]?.value || "Cabaña";
     const catalog = animal.catalogSection === "criollos" ? "criollos" : "genetica";
-    const origin = new URL(request.url).origin;
-    const animalUrl = `${origin}/${catalog}/${id}-${slugify(animal.name)}`;
+    const requestOrigin = new URL(request.url).origin;
+    const animalUrl = `${getPublicSiteUrl()}/${catalog}/${id}-${slugify(animal.name)}`;
     const qr = await QRCode.toDataURL(animalUrl, { errorCorrectionLevel: "M", margin: 1, width: 280 });
     const pdf = await PDFDocument.create();
     pdf.setTitle(`${animal.name} · RP ${animal.rp} | ${cabinName}`);
@@ -107,7 +108,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     page.drawLine({ start: { x: margin, y: pageHeight - 185 }, end: { x: pageWidth - margin, y: pageHeight - 185 }, thickness: 1, color: line });
 
     const source = readAnimalImagePresentation(animal.image).source;
-    const photo = await imageBytes(source, origin);
+    const photo = await imageBytes(source, requestOrigin);
     if (photo) {
       const embedded = await pdf.embedJpg(photo);
       const box = { x: margin, y: pageHeight - 430, width: pageWidth - margin * 2, height: 225 };
@@ -177,11 +178,17 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         if (top < 90) nextPage();
         details.drawText(horse ? "CARACTERÍSTICAS" : "DATOS GENÉTICOS", { x: margin, y: top, size: 10, font: bold, color: accent });
         top -= 23;
+        const hasPrecision = visibleDeps.some(dep => hasAnimalValue(dep.precision));
+        const hasPercentile = visibleDeps.some(dep => hasAnimalValue(dep.percentile));
+        details.drawText("CARACTERÍSTICA", { x: margin, y: top, size: 7, font: bold, color: muted });
+        details.drawText(horse ? "VALOR" : "DEP", { x: 315, y: top, size: 7, font: bold, color: muted });
+        if (hasPrecision || hasPercentile) details.drawText(hasPrecision && hasPercentile ? "PREC. / TOP" : hasPercentile ? "TOP" : "PREC.", { x: 415, y: top, size: 7, font: bold, color: muted });
+        top -= 19;
         for (const dep of visibleDeps) {
           if (top < 65) nextPage();
           details.drawText(printable(dep.label).slice(0, 50), { x: margin, y: top, size: 9, font: regular, color: ink });
           details.drawText(printable(dep.value).slice(0, 25), { x: 315, y: top, size: 9, font: bold, color: ink });
-          const reference = formatAnimalPercentile(dep.percentile) || (hasAnimalValue(dep.precision) ? dep.precision! : "");
+          const reference = [hasAnimalValue(dep.precision) ? dep.precision!.trim() : "", formatAnimalPercentile(dep.percentile)].filter(Boolean).join(" · ");
           if (reference) details.drawText(printable(reference).slice(0, 25), { x: 415, y: top, size: 8, font: regular, color: muted });
           details.drawLine({ start: { x: margin, y: top - 7 }, end: { x: pageWidth - margin, y: top - 7 }, thickness: .5, color: line });
           top -= 21;
