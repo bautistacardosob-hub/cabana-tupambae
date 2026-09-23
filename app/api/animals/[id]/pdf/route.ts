@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { getDb } from "../../../../../db";
 import { animals, geneticData, pedigreeMembers, siteContent, siteImages } from "../../../../../db/schema";
 import { animalPdfSlug, createAnimalPdf } from "../../../../../lib/animal-pdf";
@@ -17,9 +17,12 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
       db.select().from(pedigreeMembers).where(eq(pedigreeMembers.animalId, id)).orderBy(asc(pedigreeMembers.sortOrder)),
       db.select().from(geneticData).where(eq(geneticData.animalId, id)).orderBy(asc(geneticData.sortOrder)),
       db.select({ value: siteContent.value }).from(siteContent).where(and(eq(siteContent.cabinId, cabinId), eq(siteContent.contentKey, "brand_name"))).limit(1),
-      db.select({ storageKey: siteImages.storageKey, fallbackUrl: siteImages.fallbackUrl }).from(siteImages).where(and(eq(siteImages.cabinId, cabinId), eq(siteImages.imageKey, "brand-logo"))).limit(1),
+      db.select({ imageKey: siteImages.imageKey, storageKey: siteImages.storageKey, fallbackUrl: siteImages.fallbackUrl }).from(siteImages).where(and(eq(siteImages.cabinId, cabinId), inArray(siteImages.imageKey, ["brand-pdf", "brand-logo"]))),
     ]);
-    const logo = logos[0]?.storageKey ? `/api/media?key=${encodeURIComponent(logos[0].storageKey)}` : logos[0]?.fallbackUrl || "/template-brand.svg";
+    const pdfMark = logos.find(item => item.imageKey === "brand-pdf" && item.storageKey);
+    const brandLogo = logos.find(item => item.imageKey === "brand-logo");
+    const chosen = pdfMark || brandLogo;
+    const logo = chosen?.storageKey ? `/api/media?key=${encodeURIComponent(chosen.storageKey)}` : brandLogo?.fallbackUrl || "/template-brand.svg";
     const bytes = await createAnimalPdf([{ ...animal, pedigree, deps }], brand[0]?.value || "Cabaña", logo, new URL(request.url).origin);
     return new Response(bytes, { headers: { "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="ficha-${animalPdfSlug(animal.name)}-rp-${animalPdfSlug(animal.rp)}.pdf"`, "Cache-Control": "public, max-age=60" } });
   } catch (error) {

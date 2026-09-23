@@ -9,6 +9,7 @@ const allowedImages = new Set(["image/jpeg", "image/png", "image/webp", "image/g
 const maxImageBytes = 12 * 1024 * 1024;
 
 const isAllowedImage = (imageKey:string, contentType:string) =>
+  imageKey === "brand-pdf" ? ["image/svg+xml", "image/png", "image/webp"].includes(contentType) :
   allowedImages.has(contentType) || (["brand-watermark","site-icon"].includes(imageKey) && contentType === "image/svg+xml");
 
 const bucket = mediaBucket;
@@ -68,7 +69,7 @@ export async function POST(request: Request) {
       const imageType=String(body.contentType||"").trim();
       const size=Number(body.size);
       if(!/^[a-z0-9-]+$/.test(imageKey)||!filename)return Response.json({error:"Seleccioná una imagen válida."},{status:400});
-      if(!isAllowedImage(imageKey,imageType))return Response.json({error:"Usá una imagen JPG, PNG, WebP o GIF. La marca ganadera también admite SVG."},{status:400});
+      if(!isAllowedImage(imageKey,imageType))return Response.json({error:"Usá una imagen JPG, PNG, WebP o GIF. La marca para fichas PDF admite PNG, WebP o SVG transparente."},{status:400});
       if(body.action==="prepare-image"){
         if(!Number.isFinite(size)||size<=0||size>maxImageBytes)return Response.json({error:"La imagen no puede superar los 12 MB."},{status:400});
         const safeName=filename.toLowerCase().replace(/[^a-z0-9._-]+/g,"-").slice(-80)||"imagen.jpg";
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
     const fallbackUrl = String(form.get("fallbackUrl") || "/hero-cattle.jpg").trim();
     const file = form.get("file");
     if (!/^[a-z0-9-]+$/.test(imageKey) || !(file instanceof File)) return Response.json({ error: "Seleccioná una imagen válida." }, { status: 400 });
-    if (!isAllowedImage(imageKey,file.type)) return Response.json({ error: "Usá una imagen JPG, PNG, WebP o GIF. La marca ganadera también admite SVG." }, { status: 400 });
+    if (!isAllowedImage(imageKey,file.type)) return Response.json({ error: "Usá una imagen JPG, PNG, WebP o GIF. La marca para fichas PDF admite PNG, WebP o SVG transparente." }, { status: 400 });
     if (file.size > maxImageBytes) return Response.json({ error: "La imagen no puede superar los 12 MB." }, { status: 400 });
     const safeName = file.name.toLowerCase().replace(/[^a-z0-9._-]+/g, "-").slice(-80) || "imagen.jpg";
     const storageKey = `site/${imageKey}/${crypto.randomUUID()}-${safeName}`;

@@ -97,17 +97,29 @@ test("keeps a separate home crop and offers PDF and comparison tools", async () 
     source: "/api/media?key=animals%2Ftest.jpg", fit: "cover", x: 35, y: 58,
     homeFit: "contain", homeX: 50, homeY: 50,
   });
-  const [editor, page, detail, comparison, pdf] = await Promise.all([
+  const [editor, page, detail, comparison, pdf, renderer] = await Promise.all([
     readRaw("app/admin-panel.tsx"), readRaw("app/page.tsx"),
     readRaw("app/animal-detail-actions.tsx"), readRaw("app/animal-compare.tsx"),
-    readRaw("app/api/animals/[id]/pdf/route.ts"),
+    readRaw("app/api/animals/[id]/pdf/route.ts"), readRaw("lib/animal-pdf.ts"),
   ]);
   assert.match(editor, /Encuadre en Inicio/);
   assert.match(page, /image\.homeFit/);
   assert.match(detail, /Descargar ficha PDF/);
   assert.match(comparison, /Comparar seleccionados/);
-  assert.match(pdf, /QRCode\.toDataURL/);
+  assert.match(renderer, /QRCode\.toDataURL/);
   assert.match(pdf, /eq\(animals\.status, "published"\)/);
+});
+
+test("allows a separate transparent brand mark for animal PDFs", async () => {
+  const [editor, individual, catalog, renderer] = await Promise.all([
+    readRaw("app/admin-panel.tsx"), readRaw("app/api/animals/[id]/pdf/route.ts"),
+    readRaw("app/api/animals/pdf/route.ts"), readRaw("lib/animal-pdf.ts"),
+  ]);
+  assert.match(editor, /Marca para fichas PDF \(opcional\)/);
+  assert.match(individual, /pdfMark \|\| brandLogo/);
+  assert.match(catalog, /pdfMark \|\| brandLogo/);
+  assert.match(renderer, /ensureAlpha\(\)/);
+  assert.doesNotMatch(renderer, /page\.drawRectangle\(\{ x: 35, y: 760, width: 187, height: 72/);
 });
 
 test("imports complete animal catalogs from Excel with preview and duplicate handling", async () => {

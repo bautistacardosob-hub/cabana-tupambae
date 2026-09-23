@@ -53,7 +53,7 @@ async function image(source: string | null | undefined, origin: string, logo = f
     if (url.origin !== origin && url.origin !== supabase) return null;
     if (url.origin === origin && url.pathname === "/api/media") {
       const key = url.searchParams.get("key");
-      if (!key || !(logo ? key.startsWith("site/brand-logo/") : key.startsWith("animals/"))) return null;
+      if (!key || !(logo ? ["site/brand-logo/", "site/brand-pdf/"].some(prefix => key.startsWith(prefix)) : key.startsWith("animals/"))) return null;
       return image(mediaBucket().publicUrl(key), origin, logo);
     }
     let bytes: Uint8Array;
@@ -66,7 +66,17 @@ async function image(source: string | null | undefined, origin: string, logo = f
       if (bytes.length > 12_000_000) return null;
     }
     const resized = sharp(bytes).rotate().resize(logo ? 600 : 900, logo ? 300 : 600, { fit: "inside", withoutEnlargement: true });
-    return new Uint8Array(await (logo ? resized.tint({ r: 28, g: 53, b: 56 }).png() : resized.jpeg({ quality: 74 })).toBuffer());
+    if (logo) {
+      const { data, info } = await resized.ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      // Keep the mark's alpha channel while making its strokes legible on the dark PDF header.
+      for (let index = 0; index < data.length; index += 4) {
+        data[index] = 240;
+        data[index + 1] = 246;
+        data[index + 2] = 243;
+      }
+      return new Uint8Array(await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } }).png().toBuffer());
+    }
+    return new Uint8Array(await resized.jpeg({ quality: 74 }).toBuffer());
   } catch { return null; }
 }
 
@@ -95,9 +105,8 @@ export async function createAnimalPdf(records: PdfAnimal[], cabinName: string, l
     const url = `${getPublicSiteUrl()}/${horse ? "criollos" : "genetica"}/${animal.id}-${animalPdfSlug(animal.name)}`;
     page.drawRectangle({ x: 0, y: 753, width: size[0], height: 89, color: ink });
     if (logo) {
-      page.drawRectangle({ x: 35, y: 760, width: 187, height: 72, color: rgb(1, 1, 1) });
-      const scale = Math.min(156 / logo.width, 55 / logo.height);
-      page.drawImage(logo, { x: 42, y: 771 + (55 - logo.height * scale) / 2, width: logo.width * scale, height: logo.height * scale });
+      const scale = Math.min(210 / logo.width, 59 / logo.height);
+      page.drawImage(logo, { x: 42, y: 768 + (59 - logo.height * scale) / 2, width: logo.width * scale, height: logo.height * scale });
     } else {
       page.drawText(fit(cabinName.toUpperCase(), bold, 13, 230), { x: 42, y: 795, size: 13, font: bold, color: rgb(1, 1, 1) });
     }
