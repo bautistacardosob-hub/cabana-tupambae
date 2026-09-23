@@ -9,6 +9,7 @@ import { readAnimalImagePresentation } from "../lib/animal-image";
 import { formatAnimalPercentile, hasAnimalValue } from "../lib/animal-display";
 import { registrationDisplayLabel } from "../lib/animal-labels";
 import { AnimalCatalog } from "./animal-catalog";
+import "./pedigree-tree.css";
 
 export type Screen = "home" | "cabana" | "genetica" | "animal" | "criollos" | "actualidad" | "noticia" | "galeria" | "remate" | "contacto" | "pagina" | "admin";
 export type AdminSection = "resumen" | "animales" | "categorias" | "actualidad" | "remates" | "consultas" | "pagina" | "multimedia" | "cuenta";

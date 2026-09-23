@@ -1,0 +1,12 @@
+.pedigree.pedigreeTree{grid-template-columns:minmax(0,1fr) minmax(0,2.55fr);gap:28px;align-items:center}
+.pedigreeTree>.pedigreeBranches{display:grid;gap:16px;position:relative}
+.pedigreeTree>.pedigreeBranches>.pedigreeBranch{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;border:0;padding:0;background:transparent;min-height:0;position:relative}
+.pedigreeTree .pedigreeBranch:before{content:"";position:absolute;left:-14px;top:50%;width:14px;height:1px;background:#9ea19d}
+.pedigreeTree .pedigreeBranches.hasTwoBranches:before{content:"";position:absolute;left:-14px;top:25%;bottom:25%;width:1px;background:#9ea19d}
+.pedigreeTree .pedigreeParent,.pedigreeTree .pedigreeGrandparents{display:grid;gap:8px;min-width:0}
+.pedigreeTree .pedigreeParent>div,.pedigreeTree .pedigreeGrandparents>div{border:1px solid var(--line);padding:22px;background:rgba(255,255,255,.4);display:flex;flex-direction:column;justify-content:center;min-height:86px;position:relative}
+.pedigreeTree>.pedigreeBranches>.pedigreeBranch.hasGrandparents{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+.pedigreeTree .pedigreeBranch.hasGrandparents .pedigreeParent>div:after{content:"";position:absolute;right:-17px;top:50%;width:17px;height:1px;background:#9ea19d}
+.pedigreeTree .pedRoot{align-self:center}
+.pedigreeTree .pedRoot:after{right:-29px;width:29px}
+@media(max-width:900px){.pedigree.pedigreeTree{grid-template-columns:1fr;gap:12px}.pedigreeTree .pedRoot:after,.pedigreeTree .pedigreeBranch:before,.pedigreeTree .pedigreeBranches.hasTwoBranches:before,.pedigreeTree .pedigreeBranch.hasGrandparents .pedigreeParent>div:after{display:none}.pedigreeTree .pedigreeBranch{gap:10px}.pedigreeTree .pedigreeParent>div,.pedigreeTree .pedigreeGrandparents>div{padding:17px;min-height:70px}}
