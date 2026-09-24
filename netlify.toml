@@ -8,7 +8,6 @@
 
 [images]
   remote_images = [
-    "https://curupy\\.com/.*",
     "https://[a-z0-9]+\\.supabase\\.co/storage/v1/object/public/.*"
   ]
 

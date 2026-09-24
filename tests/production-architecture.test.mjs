@@ -33,8 +33,8 @@ test("uses Next.js, Supabase and Netlify in the commercial edition", async () =>
 test("allows public content images through Netlify Image CDN", async () => {
   const config = await read("netlify.toml");
   assert.match(config, /remote_images/);
-  assert.match(config, /curupy/);
   assert.match(config, /supabase/);
+  assert.doesNotMatch(config, /curupy/i);
   assert.ok(config.includes("storage/v1/object/public"));
 });
 

@@ -4,12 +4,12 @@ Adaptación independiente de la plantilla Cabañas Premium. La propuesta usa una
 
 ## Estado
 
-- Es una **propuesta local**, no el sitio oficial de Tupambaé.
+- Es una **propuesta web en preparación**, pendiente de validación final por Tupambaé.
 - La marca fue aportada por el usuario. Se conserva también el archivo original con fondo bordó; la versión transparente fue preparada para usar sobre fondos claros y oscuros.
 - Las tres fotografías Hereford de esta carpeta son **imágenes conceptuales generadas para la maqueta**. No representan animales, instalaciones ni trabajo real de Tupambaé. Deben reemplazarse antes de publicar una presentación definitiva.
 - El número `+598 91 088 716` es un contacto provisional de la propuesta. El Instagram proporcionado es `https://www.instagram.com/cabana_tupambae/`.
 - No se inventaron animales, pedigree, cifras productivas, fechas de remate ni trayectoria. El catálogo comienza vacío y las fichas nuevas usan un marcador “Fotografía pendiente”.
-- Este proyecto no está conectado a GitHub, Netlify ni Supabase de Tupambaé. No comparte credenciales ni datos con Curupy o La Morada.
+- El proyecto tiene repositorio, Netlify y Supabase exclusivos. No comparte credenciales ni datos con Curupy o La Morada.
 
 ## Vista local
 
