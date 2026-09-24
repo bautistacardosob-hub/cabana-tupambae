@@ -475,6 +475,12 @@
   resize: vertical;
 }
 
+.auctionForm label > small {
+  color: #7a837d;
+  font-size: 9px;
+  font-weight: 400;
+}
+
 .auctionForm .publishCheck {
   display: flex;
   grid-column: 1 / -1;

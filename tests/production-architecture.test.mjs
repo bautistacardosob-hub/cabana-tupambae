@@ -483,3 +483,17 @@ test("allows the home auction to appear directly before the cabin introduction",
   assert.match(admin, /option value="before_intro">Antes de La cabaña/);
   assert.match(page, /auctionPosition==="before_intro"&&auctionsLoaded&&auctionSection/);
 });
+
+test("renders auction lots as one list item per admin line", async () => {
+  const [page, admin, styles] = await Promise.all([
+    readRaw("app/page.tsx"),
+    readRaw("app/admin-panel.tsx"),
+    readRaw("app/globals.css"),
+  ]);
+  assert.match(page, /export function auctionLotItems/);
+  assert.match(page, /className="auctionLots"/);
+  assert.match(page, /className="auctionLots auctionPageLots"/);
+  assert.match(admin, /textarea name="lots"/);
+  assert.match(admin, /Escribí un lote por renglón/);
+  assert.match(styles, /\.auctionLots\{/);
+});
