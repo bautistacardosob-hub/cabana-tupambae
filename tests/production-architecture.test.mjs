@@ -471,5 +471,6 @@ test("keeps the public navigation aligned with published content", async () => {
   ]);
   assert.ok(page.includes('{nextAuction&&<button className={screen === "remate"'));
   assert.ok(page.includes('{isVisible(content,"show_news")&&<button className={screen === "actualidad"'));
-  assert.match(styles, /\.heroActions\{right:4\.5vw\}/);
+  assert.match(styles, /\.heroContent\{[^}]*max-width:none\}/);
+  assert.match(styles, /\.heroActions\{right:8vw\}/);
 });
