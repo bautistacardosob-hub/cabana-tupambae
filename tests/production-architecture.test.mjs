@@ -387,9 +387,12 @@ test("keeps sold animals visible and gives each one a personalized inquiry link"
 });
 
 test("lets each administrator change their own password and separates technical access", async () => {
-  const [page, admin, migration, generator] = await Promise.all([
+  const [page, admin, login, recovery, callback, migration, generator] = await Promise.all([
     read("app/page.tsx"),
     read("app/admin-panel.tsx"),
+    read("app/login/LoginForm.tsx"),
+    read("app/update-password/UpdatePasswordForm.tsx"),
+    read("app/auth/callback/route.ts"),
     read("drizzle-postgres/0010_separate_owner_and_support_access.sql"),
     read("scripts/prepare-client.mjs"),
   ]);
@@ -397,6 +400,10 @@ test("lets each administrator change their own password and separates technical 
   assert.match(admin, /createBrowserSupabaseClient\(\)\.auth\.updateUser/);
   assert.match(admin, /current_password:currentPassword/);
   assert.match(admin, /Accesos independientes/);
+  assert.match(login, /resetPasswordForEmail/);
+  assert.match(login, /Crear o recuperar contraseña/);
+  assert.match(recovery, /auth\.updateUser\(\{ password \}\)/);
+  assert.match(callback, /exchangeCodeForSession/);
   assert.match(migration, /private\.is_cabin_owner/);
   assert.match(migration, /and role = 'owner'/);
   assert.match(generator, /support-email/);
