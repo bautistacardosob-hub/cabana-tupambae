@@ -30,6 +30,7 @@ body[data-palette="tupambae"] .hero .eyebrow{color:#e8d7c4;font-size:11px;letter
 body[data-palette="tupambae"] .hero h1{max-width:950px;font-size:clamp(76px,8vw,125px);line-height:.91;text-wrap:balance}
 body[data-palette="tupambae"] .hero h1 em{color:#f0d8c7}
 body[data-palette="tupambae"] .heroCopy{max-width:510px;font-size:21px;line-height:1.48;color:#f8f3ea}
+body[data-palette="tupambae"] .heroActions{right:4.5vw}
 body[data-palette="tupambae"] .heroActions .roundLink{width:158px;height:158px;background:rgba(37,34,31,.25);backdrop-filter:blur(4px)}
 body[data-palette="tupambae"] .heroActions .roundLink:hover{background:var(--cream);color:var(--ink)}
 body[data-palette="tupambae"] .sectionNumber{color:#725e55}

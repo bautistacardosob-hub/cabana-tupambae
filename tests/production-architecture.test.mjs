@@ -463,3 +463,13 @@ test("separates cattle and Criollo taxonomies and supports custom animal labels"
   assert.match(migration, /'Alazán', 'alazan'/);
   assert.match(migration, /idx_animal_categories_scope_slug/);
 });
+
+test("keeps the public navigation aligned with published content", async () => {
+  const [page, styles] = await Promise.all([
+    readRaw("app/page.tsx"),
+    readRaw("app/tupambae.css"),
+  ]);
+  assert.ok(page.includes('{nextAuction&&<button className={screen === "remate"'));
+  assert.ok(page.includes('{isVisible(content,"show_news")&&<button className={screen === "actualidad"'));
+  assert.match(styles, /\.heroActions\{right:4\.5vw\}/);
+});
