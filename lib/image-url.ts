@@ -5,7 +5,8 @@ const isOptimizable = (source: string) =>
   !source.startsWith("/.netlify/images");
 
 export function optimizedImageUrl(source: string, width: number, quality = 78) {
-  if (process.env.NODE_ENV !== "production" || !isOptimizable(source)) return source;
+  // The Netlify transform endpoint is unavailable in local production previews.
+  if (process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_USE_NETLIFY_IMAGE_CDN !== "true" || !isOptimizable(source)) return source;
   const params = new URLSearchParams({
     url: source,
     w: String(Math.max(1, Math.round(width))),

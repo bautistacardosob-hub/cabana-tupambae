@@ -184,7 +184,7 @@ test("supports editable compact gallery heading", async () => {
   assert.match(styles, /\.galleryTitle\{grid-template-columns:1fr;gap:22px/);
 });
 
-test("ships as an isolated neutral client template", async () => {
+test("ships as an isolated Tupambaé client site", async () => {
   const [pkg, page, content, migration, layout, generator] = await Promise.all([
     read("package.json"),
     read("app/page.tsx"),
@@ -193,9 +193,10 @@ test("ships as an isolated neutral client template", async () => {
     read("app/layout.tsx"),
     read("scripts/prepare-client.mjs"),
   ]);
-  assert.match(pkg, /"name": "cabanas-premium-template"/);
+  assert.match(pkg, /"name": "cabana-tupambae"/);
   assert.match(page, /templateContent/);
-  assert.match(content, /brand_name:"Nombre de la cabaña"/);
+  assert.match(content, /brand_name:"Cabaña Tupambaé"/);
+  assert.match(content, /color_palette:"tupambae"/);
   assert.doesNotMatch(content + migration + layout + generator, /Curupy del Salvador|curupy\.com/i);
   assert.doesNotMatch(migration, /insert into public\.cabins/i);
   assert.match(layout, /getPublicIdentity/);
@@ -308,7 +309,7 @@ test("offers persistent public color palette presets", async () => {
     read("app/globals.css"),
     read("app/editor.css"),
   ]);
-  assert.match(content, /color_palette:"tierra"/);
+  assert.match(content, /color_palette:"tupambae"/);
   assert.match(page, /title:"Paleta de colores"/);
   assert.match(page, /document\.body\.dataset\.palette=content\.color_palette/);
   assert.match(styles, /body\[data-palette="monte"\]/);
@@ -324,7 +325,7 @@ test("offers fast persistent typography presets", async () => {
     read("app/globals.css"),
     read("app/admin-panel.tsx"),
   ]);
-  assert.match(content, /typography_style:"editorial"/);
+  assert.match(content, /typography_style:"clasica"/);
   assert.match(page, /document\.body\.dataset\.typography=content\.typography_style/);
   assert.match(page, /id:"contemporanea"/);
   assert.match(styles, /body\[data-typography="clasica"\]/);

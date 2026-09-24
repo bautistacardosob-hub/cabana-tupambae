@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getPublicIdentity } from "../lib/site-identity";
 import "./globals.css";
+import "./tupambae.css";
 
 export const revalidate=60;
 

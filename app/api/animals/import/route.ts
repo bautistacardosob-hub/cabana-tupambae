@@ -26,7 +26,7 @@ async function parseFile(form: FormData) {
     ? (firstEntry as { data: SpreadsheetCell[][] }).data
     : workbook as SpreadsheetCell[][];
   return parseAnimalWorkbook(rows, {
-    breed: String(form.get("breed") || "Aberdeen Angus"),
+    breed: String(form.get("breed") || "Hereford"),
     defaultType: String(form.get("defaultType") || "Sin categoría"),
   });
 }
@@ -43,7 +43,7 @@ function animalValues(item: ImportedAnimalDraft, catalogSection: "genetics" | "c
     status,
     featured: false,
     sold: false,
-    image: "/animal-black.jpg",
+    image: "/tupambae-animal-placeholder.svg",
     weaningWeight: item.weaningWeight || null,
     frame: item.frame || null,
     rpLabel: "RP",

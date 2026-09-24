@@ -120,7 +120,7 @@ export function parseAnimalWorkbook(rows: SpreadsheetCell[][], options?: { breed
       name,
       type: text(row[indexes.type]) || options?.defaultType || "Sin categoría",
       rp,
-      breed: options?.breed?.trim() || "Aberdeen Angus",
+      breed: options?.breed?.trim() || "Hereford",
       birthDate: excelDate(row[indexes.birthDate]),
       registration: text(row[indexes.registration]),
       weaningWeight: text(row[indexes.weight]),

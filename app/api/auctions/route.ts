@@ -17,7 +17,7 @@ function clean(payload: Record<string, unknown>) {
     description: value("description") || null,
     catalogUrl: value("catalogUrl") || null,
     streamUrl: value("streamUrl") || null,
-    image: value("image") || "/ranch.jpg",
+    image: value("image") || "/tupambae-establishment.jpg",
     status: payload.status === "past" ? "past" as const : "upcoming" as const,
     published: payload.published !== false,
     sortOrder: Number(payload.sortOrder) || 0,

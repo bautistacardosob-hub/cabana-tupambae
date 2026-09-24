@@ -66,6 +66,7 @@ export function AnimalCatalog({ animals, comparePool = animals, section, onOpen,
       {animals.map((animal, index) => {
         const picked = animal.id !== undefined && activeIds.includes(animal.id);
         const sire = animal.pedigree?.find(member => member.relation === "sire")?.name;
+        const dam = animal.pedigree?.find(member => member.relation === "dam")?.name;
         const facts = cardFacts(animal, horse);
         return <article className={`catalogAnimalCard${picked ? " isSelected" : ""}`} key={animal.id ?? animal.name}>
           <div className="catalogAnimalPhoto" style={imageStyle(animal)}>
@@ -79,6 +80,7 @@ export function AnimalCatalog({ animals, comparePool = animals, section, onOpen,
             <h2>{animal.name}</h2>
             <p className="catalogAnimalType">{animal.type}</p>
             {sire && <p className="catalogAnimalSire"><small>Padre</small>{sire}</p>}
+            {dam && <p className="catalogAnimalSire catalogAnimalDam"><small>Madre</small>{dam}</p>}
             {facts.length > 0 && <div className="catalogAnimalFacts">{facts.map(([label, value]) => <div key={label}><small title={label}>{label}</small><strong>{value}</strong></div>)}</div>}
             <div className="catalogAnimalActions"><button type="button" onClick={() => onOpen(animal)}>Ver ficha ↗</button><button type="button" className={picked ? "selected" : ""} disabled={animal.id === undefined || (!picked && activeIds.length >= 3)} onClick={() => animal.id !== undefined && toggle(animal.id)} aria-pressed={picked}>{picked ? "✓ Seleccionado" : "Comparar"}</button></div>
           </div>

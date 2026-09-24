@@ -27,12 +27,12 @@ export async function getPublicIdentity(){
     const title=content.seo_title?.trim()||`${brandName} | Genética y producción`;
     const description=content.seo_description?.trim()||content.home_hero_copy?.trim()||`${brandName}: genética, producción e identidad de la cabaña.`;
     const keywords=content.seo_keywords?.trim()||templateContent.seo_keywords;
-    const icon=mediaUrl(images["site-icon"]?.storageKey,images["site-icon"]?.fallback||"/favicon.svg");
+    const icon=mediaUrl(images["site-icon"]?.storageKey,images["site-icon"]?.fallback||"/tupambae-original-mark.png");
     const shareRow=images["seo-share"]||images["home-hero"];
-    const shareImage=mediaUrl(shareRow?.storageKey,shareRow?.fallback||"/hero-cattle.jpg");
+    const shareImage=mediaUrl(shareRow?.storageKey,shareRow?.fallback||"/tupambae-hero.jpg");
     return {brandName,title,description,keywords,icon,shareImage,siteUrl:getPublicSiteUrl()};
   }catch{
     const brandName=templateContent.brand_name;
-    return {brandName,title:`${brandName} | Genética y producción`,description:templateContent.home_hero_copy,keywords:templateContent.seo_keywords,icon:"/favicon.svg",shareImage:"/hero-cattle.jpg",siteUrl:getPublicSiteUrl()};
+    return {brandName,title:templateContent.seo_title,description:templateContent.seo_description,keywords:templateContent.seo_keywords,icon:"/tupambae-original-mark.png",shareImage:"/tupambae-hero.jpg",siteUrl:getPublicSiteUrl()};
   }
 }

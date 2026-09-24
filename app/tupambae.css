@@ -1,0 +1,128 @@
+/* A dedicated, editable identity layered over the shared Cabañas Premium components. */
+body[data-palette="tupambae"] {
+  --ink:#25221f;
+  --deep:#25221f;
+  --cream:#f2ebdd;
+  --paper:#fbf8f1;
+  --sand:#b89b78;
+  --gold:#6e2c24;
+  --line:rgba(37,34,31,.18);
+}
+
+body[data-palette="tupambae"] .brandMark{display:flex;align-items:center;gap:14px;min-width:245px}
+body[data-palette="tupambae"] .brandMark img{height:66px;width:52px;max-width:none;object-fit:contain}
+body[data-palette="tupambae"] .brandWordmark{display:grid;gap:2px;color:inherit;text-align:left;white-space:nowrap}
+body[data-palette="tupambae"] .brandWordmark small{display:block;font:600 9px/1.1 var(--sans);letter-spacing:.34em;text-transform:uppercase}
+body[data-palette="tupambae"] .brandWordmark strong{font:400 27px/.9 var(--display);letter-spacing:-.035em}
+body[data-palette="tupambae"] .siteHeader{height:98px;padding-inline:4.5vw;grid-template-columns:minmax(245px,1fr) auto minmax(30px,1fr)}
+body[data-palette="tupambae"] .siteHeader .brandMark{min-width:245px}
+body[data-palette="tupambae"] .siteHeader .brandMark img{height:66px;width:52px;max-width:none}
+body[data-palette="tupambae"] .brandDark img{filter:brightness(0)}
+body[data-palette="tupambae"] .siteHeader.headerLight .brandMark img,
+body[data-palette="tupambae"] footer .brandMark img,
+body[data-palette="tupambae"] .mobileNavPanel .brandMark img{filter:none}
+body[data-palette="tupambae"] .mainNav{gap:clamp(13px,1.65vw,28px)}
+body[data-palette="tupambae"] .mainNav button{font-size:10px;letter-spacing:.13em}
+body[data-palette="tupambae"] .hero{min-height:760px;background-position:center 53%}
+body[data-palette="tupambae"] .heroShade{background:linear-gradient(90deg,rgba(29,25,23,.79),rgba(36,29,27,.48) 42%,rgba(29,25,23,.06) 75%),linear-gradient(0deg,rgba(31,24,23,.44),transparent 42%)}
+body[data-palette="tupambae"] .heroContent{padding-top:clamp(205px,25vh,285px);padding-bottom:165px;max-width:1000px}
+body[data-palette="tupambae"] .hero .eyebrow{color:#e8d7c4;font-size:11px;letter-spacing:.32em}
+body[data-palette="tupambae"] .hero h1{max-width:950px;font-size:clamp(76px,8vw,125px);line-height:.91;text-wrap:balance}
+body[data-palette="tupambae"] .hero h1 em{color:#f0d8c7}
+body[data-palette="tupambae"] .heroCopy{max-width:510px;font-size:21px;line-height:1.48;color:#f8f3ea}
+body[data-palette="tupambae"] .heroActions .roundLink{width:158px;height:158px;background:rgba(37,34,31,.25);backdrop-filter:blur(4px)}
+body[data-palette="tupambae"] .heroActions .roundLink:hover{background:var(--cream);color:var(--ink)}
+body[data-palette="tupambae"] .sectionNumber{color:#725e55}
+body[data-palette="tupambae"] .intro{padding-top:115px;padding-bottom:110px}
+body[data-palette="tupambae"] .intro h2{max-width:810px}
+body[data-palette="tupambae"] .widePhoto{height:66vh;min-height:480px}
+body[data-palette="tupambae"] .photoCaption{font-size:10px;letter-spacing:.15em}
+body[data-palette="tupambae"] .geneticsPreview.animalCount0{grid-template-columns:.85fr 1.15fr;gap:8vw;align-items:center;padding-block:105px}
+body[data-palette="tupambae"] .geneticsPreview.animalCount0 .previewLead{padding:0}
+body[data-palette="tupambae"] .tupGeneticsVisual{position:relative;margin:0;overflow:hidden;background:#b7aa95}
+body[data-palette="tupambae"] .tupGeneticsVisual img{display:block;width:100%;height:clamp(480px,46vw,680px);object-fit:cover;object-position:center}
+body[data-palette="tupambae"] .tupGeneticsVisual:after{content:"";position:absolute;inset:58% 0 0;background:linear-gradient(transparent,rgba(26,22,20,.66));pointer-events:none}
+body[data-palette="tupambae"] .tupGeneticsVisual figcaption{position:absolute;z-index:1;bottom:26px;left:30px;right:30px;color:#fff;font:32px/1.1 var(--display)}
+body[data-palette="tupambae"] .tupGeneticsVisual figcaption small{display:block;margin-top:12px;font:10px/1.45 var(--sans);letter-spacing:.1em;text-transform:uppercase}
+body[data-palette="tupambae"] .tupAuctionTeaser{padding:100px 5vw;display:grid;grid-template-columns:1.2fr .65fr;align-items:end;gap:10vw;background:#6e2c24;color:#fff}
+body[data-palette="tupambae"] .tupAuctionTeaser .sectionNumber{color:#dfbfaa}
+body[data-palette="tupambae"] .tupAuctionTeaser h2{margin:22px 0 0;font:400 clamp(52px,5.5vw,84px)/.96 var(--display);letter-spacing:-.045em}
+body[data-palette="tupambae"] .tupAuctionTeaser h2 em{font-weight:400;color:#ebccb4}
+body[data-palette="tupambae"] .tupAuctionTeaser p:not(.sectionNumber){max-width:390px;margin:0 0 32px;font:20px/1.6 var(--display)}
+body[data-palette="tupambae"] .tupAuctionTeaser .textLink{color:#fff;border-color:#fff}
+body[data-palette="tupambae"] .availableAnimalsBanner{min-height:330px;padding-block:65px;background:#6e2c24}
+body[data-palette="tupambae"] .geneticsProgramHero{height:63vh;min-height:490px;background-position:center 47%}
+body[data-palette="tupambae"] .geneticsProgramHero>div{background:linear-gradient(90deg,rgba(33,24,23,.69),rgba(33,24,23,.05))}
+body[data-palette="tupambae"] .geneticsProgramHero h1 em{color:#ebccb4}
+body[data-palette="tupambae"] .catalogAnimalCard{border:0;background:var(--paper);box-shadow:0 1px 0 var(--line)}
+body[data-palette="tupambae"] .catalogAnimalPhoto{aspect-ratio:1.34;background-size:cover}
+body[data-palette="tupambae"] .catalogAnimalBody{padding:24px 4px 20px}
+body[data-palette="tupambae"] .catalogAnimalMeta{color:#6e2c24}
+body[data-palette="tupambae"] .catalogAnimalType{color:#6d625c}
+body[data-palette="tupambae"] .catalogAnimalSire{margin-bottom:10px;min-height:0;color:#51453f}
+body[data-palette="tupambae"] .catalogAnimalDam{margin-bottom:20px}
+body[data-palette="tupambae"] .catalogAnimalActions button:first-child{background:#6e2c24;border-color:#6e2c24;color:#fff}
+body[data-palette="tupambae"] .catalogAnimalActions button:first-child:hover{background:#52201b}
+body[data-palette="tupambae"] .storyHero,.pageTitle{padding-top:100px;padding-bottom:85px}
+body[data-palette="tupambae"] .storyPhoto{background-position:center}
+body[data-palette="tupambae"] .tupGalleryConcept{display:grid;grid-template-columns:1.35fr .8fr;gap:24px;padding:0 5vw 100px}
+body[data-palette="tupambae"] .tupGalleryConcept>div{position:relative;overflow:hidden;min-height:350px}
+body[data-palette="tupambae"] .tupGalleryConcept img{display:block;width:100%;height:100%;max-height:650px;object-fit:cover}
+body[data-palette="tupambae"] .tupGalleryConcept span{position:absolute;left:25px;bottom:24px;color:#fff;font:11px var(--sans);letter-spacing:.16em;text-transform:uppercase;text-shadow:0 1px 8px #000}
+body[data-palette="tupambae"] .tupGalleryConcept>p{grid-column:1/-1;margin:0;color:#63584f;font:13px/1.5 var(--sans)}
+body[data-palette="tupambae"] .tupContactPrompt{padding:clamp(50px,5vw,90px);display:flex;flex-direction:column;justify-content:center}
+body[data-palette="tupambae"] .tupContactPrompt h2{margin:18px 0 25px;font:400 clamp(48px,5vw,74px)/.98 var(--display);letter-spacing:-.045em}
+body[data-palette="tupambae"] .tupContactPrompt h2 em{font-weight:400;color:#6e2c24}
+body[data-palette="tupambae"] .tupContactPrompt p:not(.sectionNumber){max-width:380px;font:19px/1.5 var(--display)}
+body[data-palette="tupambae"] .tupContactPrompt a{align-self:flex-start;margin-top:18px;padding:15px 22px;background:#6e2c24;color:#fff;text-decoration:none;text-transform:uppercase;font:11px var(--sans);letter-spacing:.13em}
+body[data-palette="tupambae"] footer{background:#25221f!important}
+body[data-palette="tupambae"] footer>.brandMark img{height:116px;width:92px;max-width:none}
+body[data-palette="tupambae"] footer>.brandMark .brandWordmark strong{font-size:34px}
+body[data-palette="tupambae"] footer a{color:#d4b49a}
+body[data-palette="tupambae"] .adminSidebar .brandMark img{height:52px;width:42px}
+body[data-palette="tupambae"] .adminSidebar .brandWordmark strong{font-size:20px}
+.adminSidebar .brandWordmark,.adminLoading .brandWordmark{display:grid;gap:2px;color:inherit;text-align:left}
+.adminSidebar .brandWordmark small,.adminLoading .brandWordmark small{display:block;font:600 8px var(--sans);letter-spacing:.22em;text-transform:uppercase}
+.adminSidebar .brandWordmark strong,.adminLoading .brandWordmark strong{font:400 20px/1 var(--display)}
+.adminSidebar .brandMark,.adminLoading .brandMark{display:flex;align-items:center;gap:10px}
+.adminSidebar .brandMark img{height:48px;width:40px;max-width:none}
+.adminLoading .brandMark img{height:50px;width:42px;max-width:none;filter:brightness(0)!important}
+
+@media(max-width:1250px){
+  body[data-palette="tupambae"] .siteHeader{grid-template-columns:1fr auto}
+  body[data-palette="tupambae"] .mainNav,body[data-palette="tupambae"] .navAction{display:none}
+  body[data-palette="tupambae"] .mobileMenu{display:block}
+  body[data-palette="tupambae"] .mobileNavPanel{position:fixed;z-index:51;inset:0;display:grid;align-content:start;overflow-y:auto;padding:125px 5vw 45px;background:#25221f!important;color:#fff}
+  body[data-palette="tupambae"] .mobileNavPanel>small{margin-bottom:20px;color:#cab6a6;font-size:10px;letter-spacing:.2em;text-transform:uppercase}
+  body[data-palette="tupambae"] .mobileNavPanel>button{display:flex;align-items:center;justify-content:space-between;padding:15px 0;border:0;border-bottom:1px solid #ffffff29;background:none;color:#fff;text-align:left;font:32px/1.05 var(--display)}
+  body[data-palette="tupambae"] .mobileNavPanel>button span{font:10px var(--sans);color:#cab6a6}
+  body[data-palette="tupambae"] .mobileNavPanel>p{margin:32px 0 0}
+}
+@media(max-width:700px){
+  body[data-palette="tupambae"] .siteHeader{height:82px;padding-inline:20px}
+  body[data-palette="tupambae"] .siteHeader .brandMark{min-width:0;gap:10px}
+  body[data-palette="tupambae"] .siteHeader .brandMark img{height:51px;width:40px}
+  body[data-palette="tupambae"] .brandWordmark small{font-size:7px}
+  body[data-palette="tupambae"] .siteHeader .brandWordmark strong{font-size:21px}
+  body[data-palette="tupambae"] .hero{min-height:760px;background-position:68% center}
+  body[data-palette="tupambae"] .heroShade{background:linear-gradient(90deg,rgba(29,25,23,.73),rgba(29,25,23,.27)),linear-gradient(0deg,rgba(29,25,23,.52),transparent 60%)}
+  body[data-palette="tupambae"] .heroContent{padding:172px 20px 145px}
+  body[data-palette="tupambae"] .hero h1{font-size:clamp(52px,13vw,76px);max-width:570px}
+  body[data-palette="tupambae"] .heroCopy{font-size:17px;max-width:350px}
+  body[data-palette="tupambae"] .heroActions{left:20px;right:20px;bottom:25px;display:block}
+  body[data-palette="tupambae"] .heroActions .roundLink{width:100%;height:58px;border-radius:0;justify-content:space-between;padding:0 20px;background:rgba(37,34,31,.42);font-size:10px}
+  body[data-palette="tupambae"] .intro{padding:78px 20px 65px}
+  body[data-palette="tupambae"] .widePhoto{margin-inline:20px;height:50vh;min-height:360px;background-position:53% center}
+  body[data-palette="tupambae"] .photoCaption{left:17px;right:17px;bottom:16px;font-size:8px;gap:15px;line-height:1.5}
+  body[data-palette="tupambae"] .geneticsPreview.animalCount0{display:grid;grid-template-columns:1fr;gap:35px;padding:75px 20px}
+  body[data-palette="tupambae"] .tupGeneticsVisual img{height:440px}
+  body[data-palette="tupambae"] .tupGeneticsVisual figcaption{left:19px;right:19px;bottom:20px;font-size:26px}
+  body[data-palette="tupambae"] .tupAuctionTeaser{grid-template-columns:1fr;gap:35px;padding:78px 20px}
+  body[data-palette="tupambae"] .tupAuctionTeaser h2{font-size:clamp(48px,12vw,65px)}
+  body[data-palette="tupambae"] .tupAuctionTeaser p:not(.sectionNumber){font-size:18px}
+  body[data-palette="tupambae"] .storyHero,body[data-palette="tupambae"] .pageTitle{padding:70px 20px 60px}
+  body[data-palette="tupambae"] .tupGalleryConcept{grid-template-columns:1fr;gap:14px;padding:0 20px 75px}
+  body[data-palette="tupambae"] .tupGalleryConcept>div{min-height:300px}
+  body[data-palette="tupambae"] .tupContactPrompt{padding:65px 25px}
+  body[data-palette="tupambae"] footer>.brandMark img{height:88px;width:70px}
+}

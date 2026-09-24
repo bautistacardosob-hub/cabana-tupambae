@@ -16,7 +16,7 @@ type AnimalMediaImage = {
   storageKey?: string | null;
 };
 
-const fallbackImage = "/animal-black.jpg";
+const fallbackImage = "/tupambae-animal-placeholder.svg";
 const fitKey = "display_fit";
 const xKey = "display_x";
 const yKey = "display_y";

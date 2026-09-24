@@ -2,6 +2,7 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 import { getDb } from "../../../../../db";
 import { animals, geneticData, pedigreeMembers, siteContent, siteImages } from "../../../../../db/schema";
 import { animalPdfSlug, createAnimalPdf } from "../../../../../lib/animal-pdf";
+import { templateContent } from "../../../../../lib/template-content";
 
 export const runtime = "nodejs";
 const cabinId = Number(process.env.NEXT_PUBLIC_CABIN_ID || 1);
@@ -22,8 +23,8 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
     const pdfMark = logos.find(item => item.imageKey === "brand-pdf" && item.storageKey);
     const brandLogo = logos.find(item => item.imageKey === "brand-logo");
     const chosen = pdfMark || brandLogo;
-    const logo = chosen?.storageKey ? `/api/media?key=${encodeURIComponent(chosen.storageKey)}` : brandLogo?.fallbackUrl || "/template-brand.svg";
-    const bytes = await createAnimalPdf([{ ...animal, pedigree, deps }], brand[0]?.value || "Cabaña", logo, new URL(request.url).origin);
+    const logo = chosen?.storageKey ? `/api/media?key=${encodeURIComponent(chosen.storageKey)}` : brandLogo?.fallbackUrl || "/tupambae-mark-transparent.png";
+    const bytes = await createAnimalPdf([{ ...animal, pedigree, deps }], brand[0]?.value || templateContent.brand_name, logo, new URL(request.url).origin);
     return new Response(bytes, { headers: { "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="ficha-${animalPdfSlug(animal.name)}-rp-${animalPdfSlug(animal.rp)}.pdf"`, "Cache-Control": "public, max-age=60" } });
   } catch (error) {
     console.error("Could not create animal PDF", error);
