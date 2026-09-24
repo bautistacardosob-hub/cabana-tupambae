@@ -474,3 +474,12 @@ test("keeps the public navigation aligned with published content", async () => {
   assert.match(styles, /\.heroContent\{[^}]*max-width:none\}/);
   assert.match(styles, /\.heroActions\{right:8vw\}/);
 });
+
+test("allows the home auction to appear directly before the cabin introduction", async () => {
+  const [page, admin] = await Promise.all([
+    readRaw("app/page.tsx"),
+    readRaw("app/admin-panel.tsx"),
+  ]);
+  assert.match(admin, /option value="before_intro">Antes de La cabaña/);
+  assert.match(page, /auctionPosition==="before_intro"&&auctionsLoaded&&auctionSection/);
+});
