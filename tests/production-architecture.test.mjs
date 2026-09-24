@@ -404,6 +404,7 @@ test("lets each administrator change their own password and separates technical 
   assert.match(login, /Crear o recuperar contraseña/);
   assert.match(recovery, /auth\.updateUser\(\{ password \}\)/);
   assert.match(callback, /exchangeCodeForSession/);
+  assert.match(callback, /NEXT_PUBLIC_SITE_URL/);
   assert.match(migration, /private\.is_cabin_owner/);
   assert.match(migration, /and role = 'owner'/);
   assert.match(generator, /support-email/);
