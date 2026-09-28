@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { noticeActive, liveActive, promotionAuction, scheduleTime, uruguayDay } from "../lib/auction-promotion.ts";
+import { formatAuctionNoticeDate, noticeActive, liveActive, promotionAuction, scheduleTime, uruguayDay } from "../lib/auction-promotion.ts";
 
 const auction = { id: 3, title: "Remate de prueba", published: true, status: "upcoming", auctionDate: "2026-10-01", streamUrl: "https://youtube.com/watch?v=TC9cYaiATFA" };
 const content = { auction_promotion_id: "3", auction_notice_enabled: "true", auction_notice_start: "2026-09-28T09:00", auction_notice_end: "2026-10-02T00:00", home_auction_live_enabled: "true" };
@@ -13,6 +13,12 @@ test("scheduled announcement starts inclusively and ends exclusively in Uruguay"
   assert.equal(noticeActive(content, auction, end), false);
   assert.equal(noticeActive({ ...content, auction_notice_end: "2026-09-27T09:00" }, auction, start), false);
   assert.equal(Number.isNaN(scheduleTime("2026-02-30T10:00")), true);
+});
+
+test("the entrance notice formats the selected auction date for Uruguay", () => {
+  assert.equal(formatAuctionNoticeDate("2026-10-01"), "jueves, 1 de octubre de 2026");
+  assert.equal(formatAuctionNoticeDate(""), "");
+  assert.equal(formatAuctionNoticeDate("not-a-date"), "");
 });
 
 test("promotion remains tied to its event, with disabled defaults and no unpublished events", () => {

@@ -4,6 +4,19 @@ export function uruguayDay(now: number) {
   return new Intl.DateTimeFormat("en-CA", { timeZone: "America/Montevideo", year: "numeric", month: "2-digit", day: "2-digit" }).format(now);
 }
 
+export function formatAuctionNoticeDate(value?: string | null) {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return "";
+  const date = new Date(`${value}T12:00:00-03:00`);
+  if (!Number.isFinite(date.getTime())) return "";
+  return new Intl.DateTimeFormat("es-UY", {
+    timeZone: "America/Montevideo",
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 export function scheduleTime(value: string = "") {
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return NaN;
   const time = Date.parse(`${value}:00-03:00`);
