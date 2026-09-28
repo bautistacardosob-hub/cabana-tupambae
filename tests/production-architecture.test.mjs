@@ -95,7 +95,7 @@ test("keeps a separate home crop and offers PDF and comparison tools", async () 
   const saved = writeAnimalImagePresentation("/api/media?key=animals/test.jpg", "cover", 35, 58, "contain", 50, 50);
   assert.deepEqual(readAnimalImagePresentation(saved), {
     source: "/api/media?key=animals%2Ftest.jpg", fit: "cover", x: 35, y: 58,
-    homeFit: "contain", homeX: 50, homeY: 50,
+    homeFit: "contain", homeX: 50, homeY: 50, photoDate: "",
   });
   const [editor, page, detail, comparison, pdf, renderer] = await Promise.all([
     readRaw("app/admin-panel.tsx"), readRaw("app/page.tsx"),

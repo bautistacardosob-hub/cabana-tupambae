@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import AuctionPromotionSettings from "./auction-promotion-settings";
 import type * as React from "react";
 import { readApiJson, uploadFileDirect, uploadImageDirect } from "../lib/client-upload";
 import { createBrowserSupabaseClient } from "../lib/supabase/client";
@@ -64,7 +65,7 @@ export default function Admin({ go, animals, categories, updateCategories, aucti
         {section==="animales"&&<AdminAnimals openEditor={setEditor} animals={animals}/>}
         {section==="categorias"&&<AdminCategories categories={categories} update={updateCategories}/>}
         {section==="actualidad"&&<AdminNews content={content} updateContent={updateContent}/>}
-        {section==="remates"&&<><AuctionHomePosition content={content} updateContent={updateContent}/><AdminAuctions auctions={auctions} save={saveAuction} remove={deleteAuction}/></>}
+        {section==="remates"&&<><AuctionHomePosition content={content} updateContent={updateContent}/><AuctionPromotionSettings content={content} auctions={auctions} updateContent={updateContent}/><AdminAuctions auctions={auctions} save={saveAuction} remove={deleteAuction}/></>}
         {section==="consultas"&&<AdminMessages/>}
         {section==="pagina"&&<PageContent siteImages={siteImages} content={content} updateSiteImage={updateSiteImage} updateContent={updateContent}/>}
         {section==="multimedia"&&<MediaLibrary content={content} updateContent={updateContent}/>}
@@ -278,6 +279,7 @@ function AnimalEditor({
   const [media, setMedia] = useState<MediaRecord[]>(animal?.media ?? []);
   const initialImagePresentation = readAnimalImagePresentation(animal?.image);
   const [primaryImage, setPrimaryImage] = useState(initialImagePresentation.source);
+  const [photoDate, setPhotoDate] = useState(initialImagePresentation.photoDate);
   const [imageFit, setImageFit] = useState<AnimalImageFit>(initialImagePresentation.fit);
   const [imagePositionX, setImagePositionX] = useState(initialImagePresentation.x);
   const [imagePositionY, setImagePositionY] = useState(initialImagePresentation.y);
@@ -341,6 +343,7 @@ function AnimalEditor({
         throw new Error(data.error || "No se pudo subir la fotografía.");
       setMedia((current) => [...current, data.media!]);
       setPrimaryImage(data.media.url);
+      setPhotoDate("");
     } catch (cause) {
       setError(
         cause instanceof Error
@@ -423,7 +426,7 @@ function AnimalEditor({
         geneticsProviderName: String(data.get("geneticsProviderName") || ""),
         geneticsProviderUrl: String(data.get("geneticsProviderUrl") || ""),
         catalogSection,
-        image: writeAnimalImagePresentation(primaryImage, imageFit, imagePositionX, imagePositionY, homeImageFit, homeImageX, homeImageY),
+        image: writeAnimalImagePresentation(primaryImage, imageFit, imagePositionX, imagePositionY, homeImageFit, homeImageX, homeImageY, photoDate),
         birthWeight: String(data.get("birthWeight") || ""),
         weaningWeight: String(data.get("weaningWeight") || ""),
         scrotalCircumference: String(data.get("scrotalCircumference") || ""),
@@ -553,6 +556,10 @@ function AnimalEditor({
             <button type="button" onClick={()=>{setHomeImageFit("contain");setHomeImageX(50);setHomeImageY(50)}}>Centrar y mostrar completo</button>
           </div>
           <div className="fieldGrid">
+            <label className="fullField">Fecha de la foto de portada (opcional)
+              <input type="date" value={photoDate} onChange={event => setPhotoDate(event.target.value)}/>
+              <small>Indicá cuándo fue tomada, no cuándo la subiste. Se incluirá en la ficha PDF. Dejala vacía si no conocés la fecha.</small>
+            </label>
             <label className="fullField">
               Catálogo de venta
               <select value={catalogSection} onChange={(event) => {const next=event.target.value as "genetics"|"criollos";const previous=labelDefaults(catalogSection);const defaults=labelDefaults(next);setCatalogSection(next);setFieldLabels(current=>Object.fromEntries(Object.entries(current).map(([key,value])=>[key,value===previous[key as keyof typeof previous]?defaults[key as keyof typeof defaults]:value])) as typeof current)}}>

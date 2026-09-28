@@ -84,8 +84,16 @@ function label(page: PDFPage, value: string, x: number, y: number, font: PDFFont
   page.drawText(fit(value.toUpperCase(), font, 8, width), { x, y, size: 8, font, color: quiet });
 }
 
-export async function createAnimalPdf(records: PdfAnimal[], cabinName: string, logoSource: string | null, origin: string) {
+export type AnimalPdfContact = { phone?: string; email?: string; whatsapp?: string };
+
+export async function createAnimalPdf(records: PdfAnimal[], cabinName: string, logoSource: string | null, origin: string, contact: AnimalPdfContact = {}) {
   const pdf = await PDFDocument.create();
+  const generatedAt = new Date();
+  const generatedDate = new Intl.DateTimeFormat("es-UY", { timeZone: "America/Montevideo", day: "2-digit", month: "2-digit", year: "numeric" }).format(generatedAt);
+  pdf.setCreationDate(generatedAt);
+  pdf.setModificationDate(generatedAt);
+  const whatsappPhone = contact.whatsapp?.match(/wa\.me\/(\d+)/)?.[1];
+  const contactText = [contact.phone?.trim() || (whatsappPhone ? `+${whatsappPhone}` : ""), contact.email?.trim()].filter(Boolean).join(" · ");
   const regular = await pdf.embedFont(StandardFonts.Helvetica);
   const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
   pdf.setTitle(records.length === 1 ? `${records[0].name} - RP ${records[0].rp} | ${cabinName}` : `Catálogo de animales | ${cabinName}`);
@@ -114,6 +122,7 @@ export async function createAnimalPdf(records: PdfAnimal[], cabinName: string, l
     page.drawImage(qr, { x: 500, y: 766, width: 63, height: 63 });
     page.drawText(horse ? "FICHA CRIOLLA" : "FICHA INDIVIDUAL", { x: 331, y: 803, size: 9, font: bold, color: rgb(.91, .95, .94) });
     page.drawText("ESCANEÁ PARA VERLA ONLINE", { x: 331, y: 786, size: 7, font: regular, color: rgb(.77, .84, .83) });
+    page.drawText(`Generado el ${generatedDate}`, { x: 331, y: 770, size: 7, font: regular, color: rgb(.77, .84, .83) });
 
     const photo = photos.get(animal.id);
     page.drawRectangle({ x: 42, y: 542, width: 220, height: 190, color: cream });
@@ -123,6 +132,8 @@ export async function createAnimalPdf(records: PdfAnimal[], cabinName: string, l
       page.drawImage(embedded, { x: 42 + (220 - embedded.width * scale) / 2, y: 542 + (190 - embedded.height * scale) / 2, width: embedded.width * scale, height: embedded.height * scale });
     }
     label(page, `${animal.breed} · RP ${animal.rp}`, 282, 716, bold, 270);
+    const photoDate = readAnimalImagePresentation(animal.image).photoDate;
+    if (photoDate && photo) page.drawText(`Foto tomada el ${photoDate.split("-").reverse().join("/")}`, { x: 42, y: 534, size: 7, font: regular, color: quiet });
     const titleRows = wrap(animal.name, bold, 19, 275).slice(0, 3);
     titleRows.forEach((row, index) => page.drawText(row, { x: 282, y: 685 - index * 23, size: 19, font: bold, color: ink }));
     page.drawText(fit(animal.type, regular, 10, 260), { x: 282, y: 601, size: 10, font: regular, color: quiet });
@@ -178,7 +189,7 @@ export async function createAnimalPdf(records: PdfAnimal[], cabinName: string, l
     if (deps.length) {
       label(page, horse ? "CARACTERÍSTICAS" : "EVALUACIÓN GENÉTICA", 42, cursor, bold);
       cursor -= 17;
-      const available = cursor - 44;
+      const available = cursor - 68;
       const rowHeight = Math.min(19, available / (deps.length + 1));
       if (rowHeight < 10) throw new Error(`La ficha de ${animal.name} contiene demasiadas evaluaciones para una hoja.`);
       page.drawRectangle({ x: 42, y: cursor - rowHeight + 3, width: 511, height: rowHeight, color: ink });
@@ -195,8 +206,11 @@ export async function createAnimalPdf(records: PdfAnimal[], cabinName: string, l
         cursor -= rowHeight;
       }
     }
-    page.drawLine({ start: { x: 42, y: 31 }, end: { x: 553, y: 31 }, thickness: .5, color: rule });
-    page.drawText(fit(`${cabinName} · Información suministrada por la cabaña`, regular, 7, 450), { x: 42, y: 18, size: 7, font: regular, color: quiet });
+    page.drawLine({ start: { x: 42, y: 58 }, end: { x: 553, y: 58 }, thickness: .5, color: rule });
+    if (contactText) {
+      wrap(`Contacto: ${contactText}`, regular, 8, 490).slice(0, 2).forEach((row, index) => page.drawText(row, { x: 42, y: 44 - index * 10, size: 8, font: regular, color: ink }));
+    }
+    page.drawText(fit(`${cabinName} · Información suministrada por la cabaña`, regular, 7, 490), { x: 42, y: 18, size: 7, font: regular, color: quiet });
     page.drawText(`${pdf.getPageCount()}`, { x: 541, y: 18, size: 7, font: regular, color: quiet });
   }
   return Buffer.from(await pdf.save());

@@ -1,0 +1,27 @@
+.auctionNotice{position:fixed;z-index:150;right:24px;bottom:110px;width:min(400px,calc(100vw - 48px));background:var(--cream,#f2ebdd);color:var(--ink,#25221f);border:1px solid currentColor;box-shadow:0 12px 50px #0002}
+.auctionNotice a{display:block;padding:24px 50px 24px 24px;text-decoration:none;color:inherit}
+.auctionNotice small{display:block;text-transform:uppercase;letter-spacing:.12em;font-size:12px;margin-bottom:10px}
+.auctionNotice strong{display:block;font-family:var(--display,Georgia,serif);font-size:26px;line-height:1.15;overflow-wrap:anywhere}
+.auctionNotice p{margin:12px 0;font-size:16px;line-height:1.45;overflow-wrap:anywhere}
+.auctionNotice span{display:block;margin-top:16px;font-size:14px}
+.auctionNotice button{position:absolute;right:8px;top:8px;width:40px;height:40px;border:0;background:transparent;color:inherit;font-size:28px;cursor:pointer}
+.auctionNotice :focus-visible{outline:2px solid currentColor;outline-offset:3px}
+.homeAuctionLive{width:min(1120px,90vw);margin:0 auto;padding:64px 0;scroll-margin-top:120px}
+.homeAuctionLiveHeading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:24px}
+.homeAuctionLiveHeading h2{font-size:clamp(30px,4vw,50px);line-height:1.1;margin:12px 0;overflow-wrap:anywhere}
+.homeAuctionLiveHeading a{white-space:nowrap;color:inherit}
+.homeAuctionLivePlayer{position:relative;aspect-ratio:16/9;width:100%;background:#111}
+.homeAuctionLivePlayer iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.homeAuctionLiveExternal{display:inline-block;padding:18px 24px;border:1px solid currentColor;color:inherit}
+.auctionPromotionSettings{margin-bottom:28px}
+.auctionPromotionFields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;padding:28px}
+.auctionPromotionFields label{display:flex;flex-direction:column;gap:10px;font-size:15px}
+.auctionPromotionFields input:not([type=checkbox]),.auctionPromotionFields select{width:100%;min-width:0;padding:12px;border:1px solid #d5d9d6;border-radius:6px;background:white;color:#253a30;font:inherit}
+.auctionPromotionFields .promotionFull{grid-column:1/-1}
+.auctionPromotionFields .promotionCheck{flex-direction:row;align-items:center}
+.auctionPromotionFields input[type=checkbox]{width:20px;height:20px;accent-color:#183d2d}
+.auctionPromotionFields p{font-size:14px;line-height:1.5;color:#666}
+.auctionPromotionSettings footer{display:flex;gap:20px;align-items:center;justify-content:flex-end;padding:20px 28px;border-top:1px solid #e4e6e3}
+.auctionPromotionSettings footer button{padding:14px 22px;background:#183d2d;color:white;border:0;border-radius:6px;cursor:pointer;font:inherit}
+.auctionPromotionSettings footer button:disabled{opacity:.6}
+@media(max-width:700px){.auctionNotice{right:16px;bottom:100px;width:calc(100vw - 32px)}.homeAuctionLive{width:calc(100% - 40px);padding:40px 0}.homeAuctionLiveHeading{align-items:start;flex-direction:column}.auctionPromotionFields{grid-template-columns:1fr;padding:20px}.auctionPromotionSettings footer{flex-direction:column;align-items:stretch}}

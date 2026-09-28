@@ -17,14 +17,16 @@ export async function GET(request: Request) {
     const [pedigree, deps, brand, logos] = await Promise.all([
       db.select().from(pedigreeMembers).where(inArray(pedigreeMembers.animalId, ids)).orderBy(asc(pedigreeMembers.sortOrder)),
       db.select().from(geneticData).where(inArray(geneticData.animalId, ids)).orderBy(asc(geneticData.sortOrder)),
-      db.select({ value: siteContent.value }).from(siteContent).where(and(eq(siteContent.cabinId, cabinId), eq(siteContent.contentKey, "brand_name"))).limit(1),
+      db.select({ key: siteContent.contentKey, value: siteContent.value }).from(siteContent).where(and(eq(siteContent.cabinId, cabinId), inArray(siteContent.contentKey, ["brand_name", "contact_phone", "contact_email", "contact_whatsapp"]))),
       db.select({ imageKey: siteImages.imageKey, storageKey: siteImages.storageKey, fallbackUrl: siteImages.fallbackUrl }).from(siteImages).where(and(eq(siteImages.cabinId, cabinId), inArray(siteImages.imageKey, ["brand-pdf", "brand-logo"]))),
     ]);
     const pdfMark = logos.find(item => item.imageKey === "brand-pdf" && item.storageKey);
+    const content = Object.fromEntries(brand.map(item => [item.key, item.value]));
+    const contact = { phone: content.contact_phone, email: content.contact_email, whatsapp: content.contact_whatsapp };
     const brandLogo = logos.find(item => item.imageKey === "brand-logo");
     const chosen = pdfMark || brandLogo;
     const logo = chosen?.storageKey ? `/api/media?key=${encodeURIComponent(chosen.storageKey)}` : brandLogo?.fallbackUrl || "/tupambae-mark-transparent.png";
-    const bytes = await createAnimalPdf(rows.map(animal => ({ ...animal, pedigree: pedigree.filter(item => item.animalId === animal.id), deps: deps.filter(item => item.animalId === animal.id) })), brand[0]?.value || templateContent.brand_name, logo, new URL(request.url).origin);
+    const bytes = await createAnimalPdf(rows.map(animal => ({ ...animal, pedigree: pedigree.filter(item => item.animalId === animal.id), deps: deps.filter(item => item.animalId === animal.id) })), content.brand_name || templateContent.brand_name, logo, new URL(request.url).origin, contact);
     return new Response(bytes, { headers: { "Content-Type": "application/pdf", "Content-Disposition": `attachment; filename="${section === "criollos" ? "catalogo-criollos" : "catalogo-genetico"}.pdf"`, "Cache-Control": "public, max-age=60" } });
   } catch (error) {
     console.error("Could not create animal catalogue PDF", error);

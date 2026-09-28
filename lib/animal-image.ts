@@ -8,6 +8,7 @@ export type AnimalImagePresentation = {
   homeFit: AnimalImageFit;
   homeX: number;
   homeY: number;
+  photoDate: string;
 };
 
 type AnimalMediaImage = {
@@ -23,6 +24,13 @@ const yKey = "display_y";
 const homeFitKey = "home_fit";
 const homeXKey = "home_x";
 const homeYKey = "home_y";
+const photoDateKey = "photo_date";
+
+export function validAnimalPhotoDate(value: string | null | undefined) {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return "";
+  const date = new Date(`${value}T12:00:00Z`);
+  return Number.isFinite(date.getTime()) && date.toISOString().slice(0, 10) === value ? value : "";
+}
 
 const clampPercent = (value: string | null, fallback: number) => {
   if (value === null || value === "") return fallback;
@@ -41,7 +49,9 @@ const parseUrl = (source: string) => {
 export function readAnimalImagePresentation(value?: string | null): AnimalImagePresentation {
   const source = value?.trim() || fallbackImage;
   const url = parseUrl(source);
-  if (!url) return { source, fit: "cover", x: 50, y: 50, homeFit: "cover", homeX: 50, homeY: 50 };
+  if (!url) return { source, fit: "cover", x: 50, y: 50, homeFit: "cover", homeX: 50, homeY: 50, photoDate: "" };
+  const photoDate = validAnimalPhotoDate(url.searchParams.get(photoDateKey));
+  url.searchParams.delete(photoDateKey);
   const fit = url.searchParams.get(fitKey) === "contain" ? "contain" : "cover";
   const x = clampPercent(url.searchParams.get(xKey), 50);
   const y = clampPercent(url.searchParams.get(yKey), 50);
@@ -57,13 +67,15 @@ export function readAnimalImagePresentation(value?: string | null): AnimalImageP
   const cleanSource = url.origin === "https://cabana.local"
     ? `${url.pathname}${url.search}${url.hash}`
     : url.toString();
-  return { source: cleanSource, fit, x, y, homeFit, homeX, homeY };
+  return { source: cleanSource, fit, x, y, homeFit, homeX, homeY, photoDate };
 }
 
-export function writeAnimalImagePresentation(source: string, fit: AnimalImageFit, x: number, y: number, homeFit = fit, homeX = x, homeY = y) {
+export function writeAnimalImagePresentation(source: string, fit: AnimalImageFit, x: number, y: number, homeFit = fit, homeX = x, homeY = y, photoDate = readAnimalImagePresentation(source).photoDate) {
   const clean = readAnimalImagePresentation(source).source;
   const url = parseUrl(clean);
   if (!url) return clean;
+  const validDate = validAnimalPhotoDate(photoDate);
+  if (validDate) url.searchParams.set(photoDateKey, validDate);
   if (fit !== "cover") url.searchParams.set(fitKey, fit);
   if (x !== 50) url.searchParams.set(xKey, String(clampPercent(String(x), 50)));
   if (y !== 50) url.searchParams.set(yKey, String(clampPercent(String(y), 50)));
@@ -88,7 +100,7 @@ export function resolveAnimalPrimaryImage(value: string | null | undefined, medi
   const current = images.find(item => item.storageKey === requestedKey);
   if (current?.url) {
     const presentation = readAnimalImagePresentation(value);
-    return writeAnimalImagePresentation(current.url, presentation.fit, presentation.x, presentation.y, presentation.homeFit, presentation.homeX, presentation.homeY);
+    return writeAnimalImagePresentation(current.url, presentation.fit, presentation.x, presentation.y, presentation.homeFit, presentation.homeX, presentation.homeY, presentation.photoDate);
   }
   return images[0]?.url || fallbackImage;
 }
