@@ -99,6 +99,8 @@ export const templateContent: Record<string,string> = {
   auction_notice_message:"",
   auction_notice_start:"",
   auction_notice_end:"",
+  auction_countdown_enabled:"false",
+  auction_preoffer_url:"",
   home_auction_live_enabled:"false",
   home_auction_live_position:"after_hero",
   home_auction_live_title:"",

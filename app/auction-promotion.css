@@ -1,5 +1,5 @@
 .auctionNotice{position:fixed;z-index:150;right:24px;bottom:110px;width:min(400px,calc(100vw - 48px));background:var(--cream,#f2ebdd);color:var(--ink,#25221f);border:1px solid currentColor;box-shadow:0 12px 50px #0002}
-.auctionNotice a{display:block;padding:24px 50px 24px 24px;text-decoration:none;color:inherit}
+.auctionNotice .auctionNoticeMain{display:block;padding:24px 50px 16px 24px;text-decoration:none;color:inherit}
 .auctionNotice small{display:block;text-transform:uppercase;letter-spacing:.12em;font-size:12px;margin-bottom:10px}
 .auctionNotice strong{display:block;font-family:var(--display,Georgia,serif);font-size:26px;line-height:1.15;overflow-wrap:anywhere}
 .auctionNotice p{margin:12px 0;font-size:16px;line-height:1.45;overflow-wrap:anywhere}
@@ -7,7 +7,15 @@
 .auctionNoticeDetails div{display:grid;grid-template-columns:58px minmax(0,1fr);gap:10px;align-items:baseline}
 .auctionNoticeDetails dt{font-size:10px;line-height:1.2;letter-spacing:.11em;text-transform:uppercase;opacity:.68}
 .auctionNoticeDetails dd{margin:0;font-size:14px;line-height:1.35;text-transform:none;overflow-wrap:anywhere}
-.auctionNotice span{display:block;margin-top:16px;font-size:14px}
+.auctionNoticeMain>span{display:block;margin-top:16px;font-size:14px}
+.auctionNotice .auctionNoticePreoffer{display:block;margin:0 24px 24px;padding:13px 16px;text-align:center;text-decoration:none;background:var(--ink,#25221f);color:var(--cream,#f2ebdd);text-transform:uppercase;letter-spacing:.08em;font-size:12px}
+.auctionCountdown{display:grid;gap:5px;min-width:0;font-variant-numeric:tabular-nums}
+.auctionCountdown>span{font-size:11px;text-transform:uppercase;letter-spacing:.15em;opacity:.75}
+.auctionCountdown>strong{font-family:var(--display,Georgia,serif);font-size:clamp(24px,3vw,38px);font-weight:400;line-height:1.15;white-space:nowrap}
+.auctionCountdown--notice{padding:0 24px 20px}
+.auctionCountdown--notice>strong{font-size:27px}
+.auctionCountdown--home{padding:20px 0 0}
+.auctionCountdown--page{margin-bottom:28px}
 .auctionNotice button{position:absolute;right:8px;top:8px;width:40px;height:40px;border:0;background:transparent;color:inherit;font-size:28px;cursor:pointer}
 .auctionNotice :focus-visible{outline:2px solid currentColor;outline-offset:3px}
 .homeAuctionLive{width:min(1120px,90vw);margin:0 auto;padding:64px 0;scroll-margin-top:120px}
@@ -28,4 +36,4 @@
 .auctionPromotionSettings footer{display:flex;gap:20px;align-items:center;justify-content:flex-end;padding:20px 28px;border-top:1px solid #e4e6e3}
 .auctionPromotionSettings footer button{padding:14px 22px;background:#183d2d;color:white;border:0;border-radius:6px;cursor:pointer;font:inherit}
 .auctionPromotionSettings footer button:disabled{opacity:.6}
-@media(max-width:700px){.auctionNotice{right:16px;bottom:100px;width:calc(100vw - 32px)}.homeAuctionLive{width:calc(100% - 40px);padding:40px 0}.homeAuctionLiveHeading{align-items:start;flex-direction:column}.auctionPromotionFields{grid-template-columns:1fr;padding:20px}.auctionPromotionSettings footer{flex-direction:column;align-items:stretch}}
+@media(max-width:700px){.auctionNotice{right:16px;bottom:100px;width:calc(100vw - 32px);max-height:calc(100dvh - 125px);overflow-y:auto}.auctionCountdown--notice>strong{font-size:clamp(20px,6vw,27px)}.homeAuctionLive{width:calc(100% - 40px);padding:40px 0}.homeAuctionLiveHeading{align-items:start;flex-direction:column}.auctionPromotionFields{grid-template-columns:1fr;padding:20px}.auctionPromotionSettings footer{flex-direction:column;align-items:stretch}}

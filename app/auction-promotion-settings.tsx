@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { AuctionRecord, SiteContentMap } from "./page";
 import { readApiJson } from "../lib/client-upload";
-import { scheduleTime } from "../lib/auction-promotion";
+import { promotionPreofferUrl, scheduleTime } from "../lib/auction-promotion";
 import "./auction-promotion.css";
 
 export default function AuctionPromotionSettings({ content, auctions, updateContent }: { content: SiteContentMap; auctions: AuctionRecord[]; updateContent: (values: SiteContentMap) => void }) {
@@ -14,6 +14,8 @@ export default function AuctionPromotionSettings({ content, auctions, updateCont
     auction_notice_message: content.auction_notice_message || "",
     auction_notice_start: content.auction_notice_start || "",
     auction_notice_end: content.auction_notice_end || "",
+    auction_countdown_enabled: content.auction_countdown_enabled || "false",
+    auction_preoffer_url: content.auction_preoffer_url || "",
     home_auction_live_enabled: content.home_auction_live_enabled || "false",
     home_auction_live_position: content.home_auction_live_position || "after_hero",
     home_auction_live_title: content.home_auction_live_title || "",
@@ -23,9 +25,11 @@ export default function AuctionPromotionSettings({ content, auctions, updateCont
   const available = auctions.filter(a => a.published && a.status === "upcoming" && a.id);
   const save = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); setError(""); setMessage("");
-    const enabled = values.auction_notice_enabled === "true" || values.home_auction_live_enabled === "true";
+    const enabled = values.auction_notice_enabled === "true" || values.home_auction_live_enabled === "true" || values.auction_countdown_enabled === "true" || Boolean(values.auction_preoffer_url.trim());
     const auction = available.find(a => String(a.id) === values.auction_promotion_id);
     if (enabled && (!auction || !auction.auctionDate)) { setError("Elegí un remate publicado con fecha."); return; }
+    if (values.auction_countdown_enabled === "true" && !Number.isFinite(scheduleTime(`${auction?.auctionDate}T${auction?.auctionTime?.slice(0, 5) || ""}`))) { setError("Para el contador, indicá una fecha y hora válidas en el remate."); return; }
+    if (values.auction_preoffer_url.trim() && !promotionPreofferUrl(values, auction || null)) { setError("Ingresá un enlace de preofertas completo que empiece con https:// o http://."); return; }
     if (values.auction_notice_enabled === "true" && !(scheduleTime(values.auction_notice_end) > scheduleTime(values.auction_notice_start))) { setError("Ingresá fechas válidas: el cierre debe ser posterior al inicio."); return; }
     if (values.home_auction_live_enabled === "true" && !auction?.streamUrl?.trim()) { setError("Agregá el enlace de transmisión al remate antes de activar el vivo."); return; }
     setBusy(true);
@@ -45,6 +49,9 @@ export default function AuctionPromotionSettings({ content, auctions, updateCont
     <label>Aparece desde<input type="datetime-local" value={values.auction_notice_start} required={values.auction_notice_enabled === "true"} onChange={e => change("auction_notice_start", e.target.value)} /></label>
     <label>Se oculta desde<input type="datetime-local" value={values.auction_notice_end} required={values.auction_notice_enabled === "true"} onChange={e => change("auction_notice_end", e.target.value)} /></label>
     <p className="promotionFull">El visitante puede cerrarlo. No reaparece al navegar o recargar dentro de esa pestaña; vuelve en una nueva visita.</p>
+    <label className="promotionFull promotionCheck"><input type="checkbox" checked={values.auction_countdown_enabled === "true"} onChange={e => change("auction_countdown_enabled", String(e.target.checked))} />Mostrar cuenta regresiva hasta el inicio del remate</label>
+    <label className="promotionFull">Enlace de preofertas<input type="url" value={values.auction_preoffer_url} onChange={e => change("auction_preoffer_url", e.target.value)} placeholder="https://..." maxLength={1000} /></label>
+    <p className="promotionFull">El contador usa la fecha y hora del remate en Uruguay y se oculta al comenzar. El botón de preofertas aparece solo si cargás un enlace válido.</p>
     <label className="promotionFull promotionCheck"><input type="checkbox" checked={values.home_auction_live_enabled === "true"} onChange={e => change("home_auction_live_enabled", String(e.target.checked))} />Mostrar transmisión en Inicio el día del remate</label>
     <label>Título de la transmisión<input value={values.home_auction_live_title} onChange={e => change("home_auction_live_title", e.target.value)} placeholder="Usar el título del remate" maxLength={120} /></label>
     <label>Ubicación en Inicio<select value={values.home_auction_live_position} onChange={e => change("home_auction_live_position", e.target.value)}><option value="after_hero">Después de la portada principal</option><option value="before_genetics">Antes de Genética</option><option value="before_footer">Al final de Inicio</option></select></label>

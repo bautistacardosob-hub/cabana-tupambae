@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { AuctionRecord, SiteContentMap } from "./page";
-import { formatAuctionNoticeDate, liveActive, noticeActive, promotionAuction } from "../lib/auction-promotion";
+import { auctionCountdown, formatAuctionNoticeDate, liveActive, noticeActive, promotionAuction, promotionPreofferUrl } from "../lib/auction-promotion";
 import "./auction-promotion.css";
 
 function usePromotionClock(enabled: boolean) {
@@ -21,7 +21,7 @@ function usePromotionClock(enabled: boolean) {
 export function AuctionNotice({ content, auctions }: { content: SiteContentMap; auctions: AuctionRecord[] }) {
   const now = usePromotionClock(content.auction_notice_enabled === "true");
   const auction = now === null ? null : promotionAuction(auctions, now);
-  const key = `auction-notice:${content.auction_promotion_id}:${content.auction_notice_start}:${content.auction_notice_end}:${content.auction_notice_title}:${content.auction_notice_message}`;
+  const key = `auction-notice:${content.auction_promotion_id}:${content.auction_notice_start}:${content.auction_notice_end}:${content.auction_notice_title}:${content.auction_notice_message}:${content.auction_preoffer_url}:${content.auction_countdown_enabled}`;
   const [closedKey, setClosedKey] = useState("");
   const [checkedKey, setCheckedKey] = useState("");
   useEffect(() => {
@@ -34,10 +34,23 @@ export function AuctionNotice({ content, auctions }: { content: SiteContentMap; 
   if (now === null || checkedKey !== key || closedKey === key || !noticeActive(content, auction, now)) return null;
   const close = () => { setClosedKey(key); try { sessionStorage.setItem(key, "1"); } catch { /* Private browser storage may be unavailable. */ } };
   const date = formatAuctionNoticeDate(auction?.auctionDate);
+  const preofferUrl = promotionPreofferUrl(content, auction);
   return <aside className="auctionNotice" aria-label="Aviso de remate">
-    <a href="/proximo-remate" onClick={close}><small>Próximo remate</small><strong>{content.auction_notice_title || auction?.title}</strong>{content.auction_notice_message && <p>{content.auction_notice_message}</p>}<dl className="auctionNoticeDetails">{date&&<div><dt>Fecha</dt><dd>{date}</dd></div>}{auction?.auctionTime&&<div><dt>Hora</dt><dd>{auction.auctionTime} hs</dd></div>}{auction?.location&&<div><dt>Lugar</dt><dd>{auction.location}</dd></div>}</dl><span>Ver información del remate →</span></a>
+    <a className="auctionNoticeMain" href="/proximo-remate" onClick={close}><small>Próximo remate</small><strong>{content.auction_notice_title || auction?.title}</strong>{content.auction_notice_message && <p>{content.auction_notice_message}</p>}<dl className="auctionNoticeDetails">{date&&<div><dt>Fecha</dt><dd>{date}</dd></div>}{auction?.auctionTime&&<div><dt>Hora</dt><dd>{auction.auctionTime} hs</dd></div>}{auction?.location&&<div><dt>Lugar</dt><dd>{auction.location}</dd></div>}</dl><span>Ver información del remate →</span></a>
+    <AuctionCountdown content={content} auction={auction} variant="notice" now={now}/>
+    {preofferUrl && <a className="auctionNoticePreoffer" href={preofferUrl} target="_blank" rel="noopener noreferrer">Hacer preoferta ↗</a>}
     <button type="button" aria-label="Cerrar aviso de remate" onClick={close}>×</button>
   </aside>;
+}
+
+export function AuctionCountdown({ content, auction, variant = "page", now: currentNow }: { content: SiteContentMap; auction: AuctionRecord | null; variant?: "notice" | "home" | "page"; now?: number | null }) {
+  const enabled = content.auction_countdown_enabled === "true" && Boolean(auction?.published && auction.status === "upcoming" && String(auction.id) === content.auction_promotion_id);
+  const ownNow = usePromotionClock(enabled && currentNow === undefined);
+  const now = currentNow === undefined ? ownNow : currentNow;
+  const remaining = enabled && now !== null ? auctionCountdown(auction, now) : null;
+  if (!remaining) return null;
+  const twoDigits = (value: number) => String(value).padStart(2, "0");
+  return <div className={`auctionCountdown auctionCountdown--${variant}`} role="timer" aria-live="off"><span>Comienza en</span><strong>{remaining.days > 0 && `${remaining.days} ${remaining.days === 1 ? "día" : "días"} · `}{twoDigits(remaining.hours)}:{twoDigits(remaining.minutes)}:{twoDigits(remaining.seconds)}</strong></div>;
 }
 
 export function HomeAuctionLive({ content, auctions, position, embedUrl }: { content: SiteContentMap; auctions: AuctionRecord[]; position: string; embedUrl: (url?: string | null) => string }) {
